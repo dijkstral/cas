@@ -3550,28 +3550,6 @@
 
 	requireEs_symbol_iterator();
 
-	var es_symbol_toPrimitive = {};
-
-	var hasRequiredEs_symbol_toPrimitive;
-
-	function requireEs_symbol_toPrimitive () {
-		if (hasRequiredEs_symbol_toPrimitive) return es_symbol_toPrimitive;
-		hasRequiredEs_symbol_toPrimitive = 1;
-		var defineWellKnownSymbol = requireWellKnownSymbolDefine();
-		var defineSymbolToPrimitive = requireSymbolDefineToPrimitive();
-
-		// `Symbol.toPrimitive` well-known symbol
-		// https://tc39.es/ecma262/#sec-symbol.toprimitive
-		defineWellKnownSymbol('toPrimitive');
-
-		// `Symbol.prototype[@@toPrimitive]` method
-		// https://tc39.es/ecma262/#sec-symbol.prototype-@@toprimitive
-		defineSymbolToPrimitive();
-		return es_symbol_toPrimitive;
-	}
-
-	requireEs_symbol_toPrimitive();
-
 	var es_symbol_toStringTag = {};
 
 	var hasRequiredEs_symbol_toStringTag;
@@ -3594,6 +3572,28 @@
 	}
 
 	requireEs_symbol_toStringTag();
+
+	var es_symbol_toPrimitive = {};
+
+	var hasRequiredEs_symbol_toPrimitive;
+
+	function requireEs_symbol_toPrimitive () {
+		if (hasRequiredEs_symbol_toPrimitive) return es_symbol_toPrimitive;
+		hasRequiredEs_symbol_toPrimitive = 1;
+		var defineWellKnownSymbol = requireWellKnownSymbolDefine();
+		var defineSymbolToPrimitive = requireSymbolDefineToPrimitive();
+
+		// `Symbol.toPrimitive` well-known symbol
+		// https://tc39.es/ecma262/#sec-symbol.toprimitive
+		defineWellKnownSymbol('toPrimitive');
+
+		// `Symbol.prototype[@@toPrimitive]` method
+		// https://tc39.es/ecma262/#sec-symbol.prototype-@@toprimitive
+		defineSymbolToPrimitive();
+		return es_symbol_toPrimitive;
+	}
+
+	requireEs_symbol_toPrimitive();
 
 	var es_error_cause = {};
 
@@ -6558,6 +6558,43 @@
 
 	requireEs_arrayBuffer_transferToFixedLength();
 
+	var es_function_name = {};
+
+	var hasRequiredEs_function_name;
+
+	function requireEs_function_name () {
+		if (hasRequiredEs_function_name) return es_function_name;
+		hasRequiredEs_function_name = 1;
+		var DESCRIPTORS = requireDescriptors();
+		var FUNCTION_NAME_EXISTS = requireFunctionName().EXISTS;
+		var uncurryThis = requireFunctionUncurryThis();
+		var defineBuiltInAccessor = requireDefineBuiltInAccessor();
+
+		var FunctionPrototype = Function.prototype;
+		var functionToString = uncurryThis(FunctionPrototype.toString);
+		var nameRE = /function\b(?:\s|\/\*[\S\s]*?\*\/|\/\/[^\n\r]*[\n\r]+)*([^\s(/]*)/;
+		var regExpExec = uncurryThis(nameRE.exec);
+		var NAME = 'name';
+
+		// Function instances `.name` property
+		// https://tc39.es/ecma262/#sec-function-instances-name
+		if (DESCRIPTORS && !FUNCTION_NAME_EXISTS) {
+		  defineBuiltInAccessor(FunctionPrototype, NAME, {
+		    configurable: true,
+		    get: function () {
+		      try {
+		        return regExpExec(nameRE, functionToString(this))[1];
+		      } catch (error) {
+		        return '';
+		      }
+		    }
+		  });
+		}
+		return es_function_name;
+	}
+
+	requireEs_function_name();
+
 	var es_date_toPrimitive = {};
 
 	var dateToPrimitive;
@@ -6604,43 +6641,6 @@
 	}
 
 	requireEs_date_toPrimitive();
-
-	var es_function_name = {};
-
-	var hasRequiredEs_function_name;
-
-	function requireEs_function_name () {
-		if (hasRequiredEs_function_name) return es_function_name;
-		hasRequiredEs_function_name = 1;
-		var DESCRIPTORS = requireDescriptors();
-		var FUNCTION_NAME_EXISTS = requireFunctionName().EXISTS;
-		var uncurryThis = requireFunctionUncurryThis();
-		var defineBuiltInAccessor = requireDefineBuiltInAccessor();
-
-		var FunctionPrototype = Function.prototype;
-		var functionToString = uncurryThis(FunctionPrototype.toString);
-		var nameRE = /function\b(?:\s|\/\*[\S\s]*?\*\/|\/\/[^\n\r]*[\n\r]+)*([^\s(/]*)/;
-		var regExpExec = uncurryThis(nameRE.exec);
-		var NAME = 'name';
-
-		// Function instances `.name` property
-		// https://tc39.es/ecma262/#sec-function-instances-name
-		if (DESCRIPTORS && !FUNCTION_NAME_EXISTS) {
-		  defineBuiltInAccessor(FunctionPrototype, NAME, {
-		    configurable: true,
-		    get: function () {
-		      try {
-		        return regExpExec(nameRE, functionToString(this))[1];
-		      } catch (error) {
-		        return '';
-		      }
-		    }
-		  });
-		}
-		return es_function_name;
-	}
-
-	requireEs_function_name();
 
 	var es_globalThis = {};
 
@@ -7504,6 +7504,82 @@
 	}
 
 	requireEs_number_constructor();
+
+	var es_number_isFinite = {};
+
+	var numberIsFinite;
+	var hasRequiredNumberIsFinite;
+
+	function requireNumberIsFinite () {
+		if (hasRequiredNumberIsFinite) return numberIsFinite;
+		hasRequiredNumberIsFinite = 1;
+		var globalThis = requireGlobalThis();
+
+		var globalIsFinite = globalThis.isFinite;
+
+		// `Number.isFinite` method
+		// https://tc39.es/ecma262/#sec-number.isfinite
+		// eslint-disable-next-line es/no-number-isfinite -- safe
+		numberIsFinite = Number.isFinite || function isFinite(it) {
+		  return typeof it == 'number' && globalIsFinite(it);
+		};
+		return numberIsFinite;
+	}
+
+	var hasRequiredEs_number_isFinite;
+
+	function requireEs_number_isFinite () {
+		if (hasRequiredEs_number_isFinite) return es_number_isFinite;
+		hasRequiredEs_number_isFinite = 1;
+		var $ = require_export();
+		var numberIsFinite = requireNumberIsFinite();
+
+		// `Number.isFinite` method
+		// https://tc39.es/ecma262/#sec-number.isfinite
+		$({ target: 'Number', stat: true }, { isFinite: numberIsFinite });
+		return es_number_isFinite;
+	}
+
+	requireEs_number_isFinite();
+
+	var es_number_isInteger = {};
+
+	var isIntegralNumber;
+	var hasRequiredIsIntegralNumber;
+
+	function requireIsIntegralNumber () {
+		if (hasRequiredIsIntegralNumber) return isIntegralNumber;
+		hasRequiredIsIntegralNumber = 1;
+		var isObject = requireIsObject();
+
+		var floor = Math.floor;
+
+		// `IsIntegralNumber` abstract operation
+		// https://tc39.es/ecma262/#sec-isintegralnumber
+		// eslint-disable-next-line es/no-number-isinteger -- safe
+		isIntegralNumber = Number.isInteger || function isInteger(it) {
+		  return !isObject(it) && isFinite(it) && floor(it) === it;
+		};
+		return isIntegralNumber;
+	}
+
+	var hasRequiredEs_number_isInteger;
+
+	function requireEs_number_isInteger () {
+		if (hasRequiredEs_number_isInteger) return es_number_isInteger;
+		hasRequiredEs_number_isInteger = 1;
+		var $ = require_export();
+		var isIntegralNumber = requireIsIntegralNumber();
+
+		// `Number.isInteger` method
+		// https://tc39.es/ecma262/#sec-number.isinteger
+		$({ target: 'Number', stat: true }, {
+		  isInteger: isIntegralNumber
+		});
+		return es_number_isInteger;
+	}
+
+	requireEs_number_isInteger();
 
 	var es_number_isNan = {};
 
@@ -9699,6 +9775,27 @@
 
 	requireEs_reflect_set();
 
+	var es_reflect_toStringTag = {};
+
+	var hasRequiredEs_reflect_toStringTag;
+
+	function requireEs_reflect_toStringTag () {
+		if (hasRequiredEs_reflect_toStringTag) return es_reflect_toStringTag;
+		hasRequiredEs_reflect_toStringTag = 1;
+		var $ = require_export();
+		var globalThis = requireGlobalThis();
+		var setToStringTag = requireSetToStringTag();
+
+		$({ global: true }, { Reflect: {} });
+
+		// Reflect[@@toStringTag] property
+		// https://tc39.es/ecma262/#sec-reflect-@@tostringtag
+		setToStringTag(globalThis.Reflect, 'Reflect', true);
+		return es_reflect_toStringTag;
+	}
+
+	requireEs_reflect_toStringTag();
+
 	var es_regexp_constructor = {};
 
 	var isRegexp;
@@ -11438,6 +11535,119 @@
 
 	requireEs_string_match();
 
+	var es_string_matchAll = {};
+
+	var hasRequiredEs_string_matchAll;
+
+	function requireEs_string_matchAll () {
+		if (hasRequiredEs_string_matchAll) return es_string_matchAll;
+		hasRequiredEs_string_matchAll = 1;
+		/* eslint-disable es/no-string-prototype-matchall -- safe */
+		var $ = require_export();
+		var call = requireFunctionCall();
+		var uncurryThis = requireFunctionUncurryThisClause();
+		var createIteratorConstructor = requireIteratorCreateConstructor();
+		var createIterResultObject = requireCreateIterResultObject();
+		var requireObjectCoercible = requireRequireObjectCoercible();
+		var toLength = requireToLength();
+		var toString = requireToString();
+		var anObject = requireAnObject();
+		var isNullOrUndefined = requireIsNullOrUndefined();
+		var classof = requireClassofRaw();
+		var isRegExp = requireIsRegexp();
+		var getRegExpFlags = requireRegexpGetFlags();
+		var getMethod = requireGetMethod();
+		var defineBuiltIn = requireDefineBuiltIn();
+		var fails = requireFails();
+		var wellKnownSymbol = requireWellKnownSymbol();
+		var speciesConstructor = requireSpeciesConstructor();
+		var advanceStringIndex = requireAdvanceStringIndex();
+		var regExpExec = requireRegexpExecAbstract();
+		var InternalStateModule = requireInternalState();
+		var IS_PURE = requireIsPure();
+
+		var MATCH_ALL = wellKnownSymbol('matchAll');
+		var REGEXP_STRING = 'RegExp String';
+		var REGEXP_STRING_ITERATOR = REGEXP_STRING + ' Iterator';
+		var setInternalState = InternalStateModule.set;
+		var getInternalState = InternalStateModule.getterFor(REGEXP_STRING_ITERATOR);
+		var RegExpPrototype = RegExp.prototype;
+		var $TypeError = TypeError;
+		var stringIndexOf = uncurryThis(''.indexOf);
+		var nativeMatchAll = uncurryThis(''.matchAll);
+
+		var WORKS_WITH_NON_GLOBAL_REGEX = !!nativeMatchAll && !fails(function () {
+		  nativeMatchAll('a', /./);
+		});
+
+		var $RegExpStringIterator = createIteratorConstructor(function RegExpStringIterator(regexp, string, $global, fullUnicode) {
+		  setInternalState(this, {
+		    type: REGEXP_STRING_ITERATOR,
+		    regexp: regexp,
+		    string: string,
+		    global: $global,
+		    unicode: fullUnicode,
+		    done: false
+		  });
+		}, REGEXP_STRING, function next() {
+		  var state = getInternalState(this);
+		  if (state.done) return createIterResultObject(undefined, true);
+		  var R = state.regexp;
+		  var S = state.string;
+		  var match = regExpExec(R, S);
+		  if (match === null) {
+		    state.done = true;
+		    return createIterResultObject(undefined, true);
+		  }
+		  if (state.global) {
+		    if (toString(match[0]) === '') R.lastIndex = advanceStringIndex(S, toLength(R.lastIndex), state.unicode);
+		    return createIterResultObject(match, false);
+		  }
+		  state.done = true;
+		  return createIterResultObject(match, false);
+		});
+
+		var $matchAll = function (string) {
+		  var R = anObject(this);
+		  var S = toString(string);
+		  var C = speciesConstructor(R, RegExp);
+		  var flags = toString(getRegExpFlags(R));
+		  var matcher, $global, fullUnicode;
+		  matcher = new C(C === RegExp ? R.source : R, flags);
+		  $global = !!~stringIndexOf(flags, 'g');
+		  fullUnicode = !!~stringIndexOf(flags, 'u');
+		  matcher.lastIndex = toLength(R.lastIndex);
+		  return new $RegExpStringIterator(matcher, S, $global, fullUnicode);
+		};
+
+		// `String.prototype.matchAll` method
+		// https://tc39.es/ecma262/#sec-string.prototype.matchall
+		$({ target: 'String', proto: true, forced: WORKS_WITH_NON_GLOBAL_REGEX }, {
+		  matchAll: function matchAll(regexp) {
+		    var O = requireObjectCoercible(this);
+		    var flags, S, matcher, rx;
+		    if (!isNullOrUndefined(regexp)) {
+		      if (isRegExp(regexp)) {
+		        flags = toString(requireObjectCoercible(getRegExpFlags(regexp)));
+		        if (!~stringIndexOf(flags, 'g')) throw new $TypeError('`.matchAll` does not allow non-global regexes');
+		      }
+		      if (WORKS_WITH_NON_GLOBAL_REGEX) return nativeMatchAll(O, regexp);
+		      matcher = getMethod(regexp, MATCH_ALL);
+		      if (matcher === undefined && IS_PURE && classof(regexp) === 'RegExp') matcher = $matchAll;
+		      if (matcher) return call(matcher, regexp, O);
+		    } else if (WORKS_WITH_NON_GLOBAL_REGEX) return nativeMatchAll(O, regexp);
+		    S = toString(O);
+		    rx = new RegExp(regexp, 'g');
+		    return IS_PURE ? call($matchAll, rx, S) : rx[MATCH_ALL](S);
+		  }
+		});
+
+		IS_PURE || MATCH_ALL in RegExpPrototype || defineBuiltIn(RegExpPrototype, MATCH_ALL, $matchAll);
+		return es_string_matchAll;
+	}
+
+	requireEs_string_matchAll();
+
 	var es_string_replace = {};
 
 	var getSubstitution;
@@ -12063,6 +12273,1767 @@
 	}
 
 	requireEs_string_sub();
+
+	var es_typedArray_uint8Array = {};
+
+	var typedArrayConstructor = {exports: {}};
+
+	var arrayBufferViewCore;
+	var hasRequiredArrayBufferViewCore;
+
+	function requireArrayBufferViewCore () {
+		if (hasRequiredArrayBufferViewCore) return arrayBufferViewCore;
+		hasRequiredArrayBufferViewCore = 1;
+		var NATIVE_ARRAY_BUFFER = requireArrayBufferBasicDetection();
+		var DESCRIPTORS = requireDescriptors();
+		var globalThis = requireGlobalThis();
+		var isCallable = requireIsCallable();
+		var isObject = requireIsObject();
+		var hasOwn = requireHasOwnProperty();
+		var classof = requireClassof();
+		var tryToString = requireTryToString();
+		var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+		var defineBuiltIn = requireDefineBuiltIn();
+		var defineBuiltInAccessor = requireDefineBuiltInAccessor();
+		var isPrototypeOf = requireObjectIsPrototypeOf();
+		var getPrototypeOf = requireObjectGetPrototypeOf();
+		var setPrototypeOf = requireObjectSetPrototypeOf();
+		var wellKnownSymbol = requireWellKnownSymbol();
+		var uid = requireUid();
+		var InternalStateModule = requireInternalState();
+
+		var enforceInternalState = InternalStateModule.enforce;
+		var getInternalState = InternalStateModule.get;
+		var Int8Array = globalThis.Int8Array;
+		var Int8ArrayPrototype = Int8Array && Int8Array.prototype;
+		var Uint8ClampedArray = globalThis.Uint8ClampedArray;
+		var Uint8ClampedArrayPrototype = Uint8ClampedArray && Uint8ClampedArray.prototype;
+		var TypedArray = Int8Array && getPrototypeOf(Int8Array);
+		var TypedArrayPrototype = Int8ArrayPrototype && getPrototypeOf(Int8ArrayPrototype);
+		var ObjectPrototype = Object.prototype;
+		var TypeError = globalThis.TypeError;
+
+		var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+		var TYPED_ARRAY_TAG = uid('TYPED_ARRAY_TAG');
+		var TYPED_ARRAY_CONSTRUCTOR = 'TypedArrayConstructor';
+		// Fixing native typed arrays in Opera Presto crashes the browser, see #595
+		var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!setPrototypeOf && classof(globalThis.opera) !== 'Opera';
+		var TYPED_ARRAY_TAG_REQUIRED = false;
+		var NAME, Constructor, Prototype;
+
+		var TypedArrayConstructorsList = {
+		  Int8Array: 1,
+		  Uint8Array: 1,
+		  Uint8ClampedArray: 1,
+		  Int16Array: 2,
+		  Uint16Array: 2,
+		  Int32Array: 4,
+		  Uint32Array: 4,
+		  Float32Array: 4,
+		  Float64Array: 8
+		};
+
+		var BigIntArrayConstructorsList = {
+		  BigInt64Array: 8,
+		  BigUint64Array: 8
+		};
+
+		var isView = function isView(it) {
+		  if (!isObject(it)) return false;
+		  var klass = classof(it);
+		  return klass === 'DataView'
+		    || hasOwn(TypedArrayConstructorsList, klass)
+		    || hasOwn(BigIntArrayConstructorsList, klass);
+		};
+
+		var getTypedArrayConstructor = function (it) {
+		  var proto = getPrototypeOf(it);
+		  if (!isObject(proto)) return;
+		  var state = getInternalState(proto);
+		  return (state && hasOwn(state, TYPED_ARRAY_CONSTRUCTOR)) ? state[TYPED_ARRAY_CONSTRUCTOR] : getTypedArrayConstructor(proto);
+		};
+
+		var isTypedArray = function (it) {
+		  if (!isObject(it)) return false;
+		  var klass = classof(it);
+		  return hasOwn(TypedArrayConstructorsList, klass)
+		    || hasOwn(BigIntArrayConstructorsList, klass);
+		};
+
+		var aTypedArray = function (it) {
+		  if (isTypedArray(it)) return it;
+		  throw new TypeError('Target is not a typed array');
+		};
+
+		var aTypedArrayConstructor = function (C) {
+		  if (isCallable(C) && (!setPrototypeOf || isPrototypeOf(TypedArray, C))) return C;
+		  throw new TypeError(tryToString(C) + ' is not a typed array constructor');
+		};
+
+		var exportTypedArrayMethod = function (KEY, property, forced, options) {
+		  if (!DESCRIPTORS) return;
+		  if (forced) for (var ARRAY in TypedArrayConstructorsList) {
+		    var TypedArrayConstructor = globalThis[ARRAY];
+		    if (TypedArrayConstructor && hasOwn(TypedArrayConstructor.prototype, KEY)) try {
+		      delete TypedArrayConstructor.prototype[KEY];
+		    } catch (error) {
+		      // old WebKit bug - some methods are non-configurable
+		      try {
+		        TypedArrayConstructor.prototype[KEY] = property;
+		      } catch (error2) { /* empty */ }
+		    }
+		  }
+		  if (!TypedArrayPrototype[KEY] || forced) {
+		    defineBuiltIn(TypedArrayPrototype, KEY, forced ? property
+		      : NATIVE_ARRAY_BUFFER_VIEWS && Int8ArrayPrototype[KEY] || property, options);
+		  }
+		};
+
+		var exportTypedArrayStaticMethod = function (KEY, property, forced) {
+		  var ARRAY, TypedArrayConstructor;
+		  if (!DESCRIPTORS) return;
+		  if (setPrototypeOf) {
+		    if (forced) for (ARRAY in TypedArrayConstructorsList) {
+		      TypedArrayConstructor = globalThis[ARRAY];
+		      if (TypedArrayConstructor && hasOwn(TypedArrayConstructor, KEY)) try {
+		        delete TypedArrayConstructor[KEY];
+		      } catch (error) { /* empty */ }
+		    }
+		    if (!TypedArray[KEY] || forced) {
+		      // V8 ~ Chrome 49-50 `%TypedArray%` methods are non-writable non-configurable
+		      try {
+		        return defineBuiltIn(TypedArray, KEY, forced ? property : NATIVE_ARRAY_BUFFER_VIEWS && TypedArray[KEY] || property);
+		      } catch (error) { /* empty */ }
+		    } else return;
+		  }
+		  for (ARRAY in TypedArrayConstructorsList) {
+		    TypedArrayConstructor = globalThis[ARRAY];
+		    if (TypedArrayConstructor && (!TypedArrayConstructor[KEY] || forced)) {
+		      defineBuiltIn(TypedArrayConstructor, KEY, property);
+		    }
+		  }
+		};
+
+		for (NAME in TypedArrayConstructorsList) {
+		  Constructor = globalThis[NAME];
+		  Prototype = Constructor && Constructor.prototype;
+		  if (Prototype) enforceInternalState(Prototype)[TYPED_ARRAY_CONSTRUCTOR] = Constructor;
+		  else NATIVE_ARRAY_BUFFER_VIEWS = false;
+		}
+
+		for (NAME in BigIntArrayConstructorsList) {
+		  Constructor = globalThis[NAME];
+		  Prototype = Constructor && Constructor.prototype;
+		  if (Prototype) enforceInternalState(Prototype)[TYPED_ARRAY_CONSTRUCTOR] = Constructor;
+		}
+
+		// WebKit bug - typed arrays constructors prototype is Object.prototype
+		if (!NATIVE_ARRAY_BUFFER_VIEWS || !isCallable(TypedArray) || TypedArray === Function.prototype) {
+		  // eslint-disable-next-line no-shadow -- safe
+		  TypedArray = function TypedArray() {
+		    throw new TypeError('Incorrect invocation');
+		  };
+		  if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME in TypedArrayConstructorsList) {
+		    if (globalThis[NAME]) setPrototypeOf(globalThis[NAME], TypedArray);
+		  }
+		}
+
+		if (!NATIVE_ARRAY_BUFFER_VIEWS || !TypedArrayPrototype || TypedArrayPrototype === ObjectPrototype) {
+		  TypedArrayPrototype = TypedArray.prototype;
+		  if (NATIVE_ARRAY_BUFFER_VIEWS) for (NAME in TypedArrayConstructorsList) {
+		    if (globalThis[NAME]) setPrototypeOf(globalThis[NAME].prototype, TypedArrayPrototype);
+		  }
+		}
+
+		// WebKit bug - one more object in Uint8ClampedArray prototype chain
+		if (NATIVE_ARRAY_BUFFER_VIEWS && getPrototypeOf(Uint8ClampedArrayPrototype) !== TypedArrayPrototype) {
+		  setPrototypeOf(Uint8ClampedArrayPrototype, TypedArrayPrototype);
+		}
+
+		if (DESCRIPTORS && !hasOwn(TypedArrayPrototype, TO_STRING_TAG)) {
+		  TYPED_ARRAY_TAG_REQUIRED = true;
+		  defineBuiltInAccessor(TypedArrayPrototype, TO_STRING_TAG, {
+		    configurable: true,
+		    get: function () {
+		      return isObject(this) ? this[TYPED_ARRAY_TAG] : undefined;
+		    }
+		  });
+		  for (NAME in TypedArrayConstructorsList) if (globalThis[NAME]) {
+		    createNonEnumerableProperty(globalThis[NAME], TYPED_ARRAY_TAG, NAME);
+		  }
+		}
+
+		arrayBufferViewCore = {
+		  NATIVE_ARRAY_BUFFER_VIEWS: NATIVE_ARRAY_BUFFER_VIEWS,
+		  TYPED_ARRAY_TAG: TYPED_ARRAY_TAG_REQUIRED && TYPED_ARRAY_TAG,
+		  aTypedArray: aTypedArray,
+		  aTypedArrayConstructor: aTypedArrayConstructor,
+		  exportTypedArrayMethod: exportTypedArrayMethod,
+		  exportTypedArrayStaticMethod: exportTypedArrayStaticMethod,
+		  getTypedArrayConstructor: getTypedArrayConstructor,
+		  isView: isView,
+		  isTypedArray: isTypedArray,
+		  TypedArray: TypedArray,
+		  TypedArrayPrototype: TypedArrayPrototype
+		};
+		return arrayBufferViewCore;
+	}
+
+	var typedArrayConstructorsRequireWrappers;
+	var hasRequiredTypedArrayConstructorsRequireWrappers;
+
+	function requireTypedArrayConstructorsRequireWrappers () {
+		if (hasRequiredTypedArrayConstructorsRequireWrappers) return typedArrayConstructorsRequireWrappers;
+		hasRequiredTypedArrayConstructorsRequireWrappers = 1;
+		/* eslint-disable no-new, sonarjs/inconsistent-function-call -- required for testing */
+		var globalThis = requireGlobalThis();
+		var fails = requireFails();
+		var checkCorrectnessOfIteration = requireCheckCorrectnessOfIteration();
+		var NATIVE_ARRAY_BUFFER_VIEWS = requireArrayBufferViewCore().NATIVE_ARRAY_BUFFER_VIEWS;
+
+		var ArrayBuffer = globalThis.ArrayBuffer;
+		var Int8Array = globalThis.Int8Array;
+
+		typedArrayConstructorsRequireWrappers = !NATIVE_ARRAY_BUFFER_VIEWS || !fails(function () {
+		  Int8Array(1);
+		}) || !fails(function () {
+		  new Int8Array(-1);
+		}) || !checkCorrectnessOfIteration(function (iterable) {
+		  new Int8Array();
+		  new Int8Array(null);
+		  new Int8Array(1.5);
+		  new Int8Array(iterable);
+		}, true) || fails(function () {
+		  // Safari (11+) bug - a reason why even Safari 13 should load a typed array polyfill
+		  return new Int8Array(new ArrayBuffer(2), 1, undefined).length !== 1;
+		});
+		return typedArrayConstructorsRequireWrappers;
+	}
+
+	var toPositiveInteger;
+	var hasRequiredToPositiveInteger;
+
+	function requireToPositiveInteger () {
+		if (hasRequiredToPositiveInteger) return toPositiveInteger;
+		hasRequiredToPositiveInteger = 1;
+		var toIntegerOrInfinity = requireToIntegerOrInfinity();
+
+		var $RangeError = RangeError;
+
+		toPositiveInteger = function (it) {
+		  var result = toIntegerOrInfinity(it);
+		  if (result < 0) throw new $RangeError("The argument can't be less than 0");
+		  return result;
+		};
+		return toPositiveInteger;
+	}
+
+	var toOffset;
+	var hasRequiredToOffset;
+
+	function requireToOffset () {
+		if (hasRequiredToOffset) return toOffset;
+		hasRequiredToOffset = 1;
+		var toPositiveInteger = requireToPositiveInteger();
+
+		var $RangeError = RangeError;
+
+		toOffset = function (it, BYTES) {
+		  var offset = toPositiveInteger(it);
+		  if (offset % BYTES) throw new $RangeError('Wrong offset');
+		  return offset;
+		};
+		return toOffset;
+	}
+
+	var toUint8Clamped;
+	var hasRequiredToUint8Clamped;
+
+	function requireToUint8Clamped () {
+		if (hasRequiredToUint8Clamped) return toUint8Clamped;
+		hasRequiredToUint8Clamped = 1;
+		var round = Math.round;
+
+		toUint8Clamped = function (it) {
+		  var value = round(it);
+		  return value < 0 ? 0 : value > 0xFF ? 0xFF : value & 0xFF;
+		};
+		return toUint8Clamped;
+	}
+
+	var isBigIntArray;
+	var hasRequiredIsBigIntArray;
+
+	function requireIsBigIntArray () {
+		if (hasRequiredIsBigIntArray) return isBigIntArray;
+		hasRequiredIsBigIntArray = 1;
+		var classof = requireClassof();
+
+		isBigIntArray = function (it) {
+		  var klass = classof(it);
+		  return klass === 'BigInt64Array' || klass === 'BigUint64Array';
+		};
+		return isBigIntArray;
+	}
+
+	var toBigInt;
+	var hasRequiredToBigInt;
+
+	function requireToBigInt () {
+		if (hasRequiredToBigInt) return toBigInt;
+		hasRequiredToBigInt = 1;
+		var toPrimitive = requireToPrimitive();
+
+		var $TypeError = TypeError;
+
+		// `ToBigInt` abstract operation
+		// https://tc39.es/ecma262/#sec-tobigint
+		toBigInt = function (argument) {
+		  var prim = toPrimitive(argument, 'number');
+		  if (typeof prim == 'number') throw new $TypeError("Can't convert number to bigint");
+		  // eslint-disable-next-line es/no-bigint -- safe
+		  return BigInt(prim);
+		};
+		return toBigInt;
+	}
+
+	var typedArrayFrom;
+	var hasRequiredTypedArrayFrom;
+
+	function requireTypedArrayFrom () {
+		if (hasRequiredTypedArrayFrom) return typedArrayFrom;
+		hasRequiredTypedArrayFrom = 1;
+		var bind = requireFunctionBindContext();
+		var call = requireFunctionCall();
+		var aConstructor = requireAConstructor();
+		var toObject = requireToObject();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var getIterator = requireGetIterator();
+		var getIteratorMethod = requireGetIteratorMethod();
+		var isArrayIteratorMethod = requireIsArrayIteratorMethod();
+		var isBigIntArray = requireIsBigIntArray();
+		var aTypedArrayConstructor = requireArrayBufferViewCore().aTypedArrayConstructor;
+		var toBigInt = requireToBigInt();
+
+		typedArrayFrom = function from(source /* , mapfn, thisArg */) {
+		  var C = aConstructor(this);
+		  var O = toObject(source);
+		  var argumentsLength = arguments.length;
+		  var mapfn = argumentsLength > 1 ? arguments[1] : undefined;
+		  var mapping = mapfn !== undefined;
+		  var iteratorMethod = getIteratorMethod(O);
+		  var i, length, result, thisIsBigIntArray, value, step, iterator, next;
+		  if (iteratorMethod && !isArrayIteratorMethod(iteratorMethod)) {
+		    iterator = getIterator(O, iteratorMethod);
+		    next = iterator.next;
+		    O = [];
+		    while (!(step = call(next, iterator)).done) {
+		      O.push(step.value);
+		    }
+		  }
+		  if (mapping && argumentsLength > 2) {
+		    mapfn = bind(mapfn, arguments[2]);
+		  }
+		  length = lengthOfArrayLike(O);
+		  result = new (aTypedArrayConstructor(C))(length);
+		  thisIsBigIntArray = isBigIntArray(result);
+		  for (i = 0; length > i; i++) {
+		    value = mapping ? mapfn(O[i], i) : O[i];
+		    // FF30- typed arrays doesn't properly convert objects to typed array values
+		    result[i] = thisIsBigIntArray ? toBigInt(value) : +value;
+		  }
+		  return result;
+		};
+		return typedArrayFrom;
+	}
+
+	var hasRequiredTypedArrayConstructor;
+
+	function requireTypedArrayConstructor () {
+		if (hasRequiredTypedArrayConstructor) return typedArrayConstructor.exports;
+		hasRequiredTypedArrayConstructor = 1;
+		var $ = require_export();
+		var globalThis = requireGlobalThis();
+		var call = requireFunctionCall();
+		var DESCRIPTORS = requireDescriptors();
+		var TYPED_ARRAYS_CONSTRUCTORS_REQUIRES_WRAPPERS = requireTypedArrayConstructorsRequireWrappers();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var ArrayBufferModule = requireArrayBuffer();
+		var anInstance = requireAnInstance();
+		var createPropertyDescriptor = requireCreatePropertyDescriptor();
+		var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+		var isIntegralNumber = requireIsIntegralNumber();
+		var toLength = requireToLength();
+		var toIndex = requireToIndex();
+		var toOffset = requireToOffset();
+		var toUint8Clamped = requireToUint8Clamped();
+		var toPropertyKey = requireToPropertyKey();
+		var hasOwn = requireHasOwnProperty();
+		var classof = requireClassof();
+		var isObject = requireIsObject();
+		var isSymbol = requireIsSymbol();
+		var create = requireObjectCreate();
+		var isPrototypeOf = requireObjectIsPrototypeOf();
+		var setPrototypeOf = requireObjectSetPrototypeOf();
+		var getOwnPropertyNames = requireObjectGetOwnPropertyNames().f;
+		var typedArrayFrom = requireTypedArrayFrom();
+		var forEach = requireArrayIteration().forEach;
+		var setSpecies = requireSetSpecies();
+		var defineBuiltInAccessor = requireDefineBuiltInAccessor();
+		var definePropertyModule = requireObjectDefineProperty();
+		var getOwnPropertyDescriptorModule = requireObjectGetOwnPropertyDescriptor();
+		var arrayFromConstructorAndList = requireArrayFromConstructorAndList();
+		var InternalStateModule = requireInternalState();
+		var inheritIfRequired = requireInheritIfRequired();
+
+		var getInternalState = InternalStateModule.get;
+		var setInternalState = InternalStateModule.set;
+		var enforceInternalState = InternalStateModule.enforce;
+		var nativeDefineProperty = definePropertyModule.f;
+		var nativeGetOwnPropertyDescriptor = getOwnPropertyDescriptorModule.f;
+		var RangeError = globalThis.RangeError;
+		var ArrayBuffer = ArrayBufferModule.ArrayBuffer;
+		var ArrayBufferPrototype = ArrayBuffer.prototype;
+		var DataView = ArrayBufferModule.DataView;
+		var NATIVE_ARRAY_BUFFER_VIEWS = ArrayBufferViewCore.NATIVE_ARRAY_BUFFER_VIEWS;
+		var TYPED_ARRAY_TAG = ArrayBufferViewCore.TYPED_ARRAY_TAG;
+		var TypedArray = ArrayBufferViewCore.TypedArray;
+		var TypedArrayPrototype = ArrayBufferViewCore.TypedArrayPrototype;
+		var isTypedArray = ArrayBufferViewCore.isTypedArray;
+		var BYTES_PER_ELEMENT = 'BYTES_PER_ELEMENT';
+		var WRONG_LENGTH = 'Wrong length';
+
+		var addGetter = function (it, key) {
+		  defineBuiltInAccessor(it, key, {
+		    configurable: true,
+		    get: function () {
+		      return getInternalState(this)[key];
+		    }
+		  });
+		};
+
+		var isArrayBuffer = function (it) {
+		  var klass;
+		  return isPrototypeOf(ArrayBufferPrototype, it) || (klass = classof(it)) === 'ArrayBuffer' || klass === 'SharedArrayBuffer';
+		};
+
+		var isTypedArrayIndex = function (target, key) {
+		  return isTypedArray(target)
+		    && !isSymbol(key)
+		    && key in target
+		    && isIntegralNumber(+key)
+		    && key >= 0;
+		};
+
+		var wrappedGetOwnPropertyDescriptor = function getOwnPropertyDescriptor(target, key) {
+		  key = toPropertyKey(key);
+		  return isTypedArrayIndex(target, key)
+		    ? createPropertyDescriptor(2, target[key])
+		    : nativeGetOwnPropertyDescriptor(target, key);
+		};
+
+		var wrappedDefineProperty = function defineProperty(target, key, descriptor) {
+		  key = toPropertyKey(key);
+		  if (isTypedArrayIndex(target, key)
+		    && isObject(descriptor)
+		    && hasOwn(descriptor, 'value')
+		    && !hasOwn(descriptor, 'get')
+		    && !hasOwn(descriptor, 'set')
+		    // TODO: add validation descriptor w/o calling accessors
+		    && !descriptor.configurable
+		    && (!hasOwn(descriptor, 'writable') || descriptor.writable)
+		    && (!hasOwn(descriptor, 'enumerable') || descriptor.enumerable)
+		  ) {
+		    target[key] = descriptor.value;
+		    return target;
+		  } return nativeDefineProperty(target, key, descriptor);
+		};
+
+		if (DESCRIPTORS) {
+		  if (!NATIVE_ARRAY_BUFFER_VIEWS) {
+		    getOwnPropertyDescriptorModule.f = wrappedGetOwnPropertyDescriptor;
+		    definePropertyModule.f = wrappedDefineProperty;
+		    addGetter(TypedArrayPrototype, 'buffer');
+		    addGetter(TypedArrayPrototype, 'byteOffset');
+		    addGetter(TypedArrayPrototype, 'byteLength');
+		    addGetter(TypedArrayPrototype, 'length');
+		  }
+
+		  $({ target: 'Object', stat: true, forced: !NATIVE_ARRAY_BUFFER_VIEWS }, {
+		    getOwnPropertyDescriptor: wrappedGetOwnPropertyDescriptor,
+		    defineProperty: wrappedDefineProperty
+		  });
+
+		  typedArrayConstructor.exports = function (TYPE, wrapper, CLAMPED) {
+		    var BYTES = TYPE.match(/\d+/)[0] / 8;
+		    var CONSTRUCTOR_NAME = TYPE + (CLAMPED ? 'Clamped' : '') + 'Array';
+		    var GETTER = 'get' + TYPE;
+		    var SETTER = 'set' + TYPE;
+		    var NativeTypedArrayConstructor = globalThis[CONSTRUCTOR_NAME];
+		    var TypedArrayConstructor = NativeTypedArrayConstructor;
+		    var TypedArrayConstructorPrototype = TypedArrayConstructor && TypedArrayConstructor.prototype;
+		    var exported = {};
+
+		    var getter = function (that, index) {
+		      var data = getInternalState(that);
+		      return data.view[GETTER](index * BYTES + data.byteOffset, true);
+		    };
+
+		    var setter = function (that, index, value) {
+		      var data = getInternalState(that);
+		      data.view[SETTER](index * BYTES + data.byteOffset, CLAMPED ? toUint8Clamped(value) : value, true);
+		    };
+
+		    var addElement = function (that, index) {
+		      nativeDefineProperty(that, index, {
+		        get: function () {
+		          return getter(this, index);
+		        },
+		        set: function (value) {
+		          return setter(this, index, value);
+		        },
+		        enumerable: true
+		      });
+		    };
+
+		    if (!NATIVE_ARRAY_BUFFER_VIEWS) {
+		      TypedArrayConstructor = wrapper(function (that, data, offset, $length) {
+		        anInstance(that, TypedArrayConstructorPrototype);
+		        var index = 0;
+		        var byteOffset = 0;
+		        var buffer, byteLength, length;
+		        if (!isObject(data)) {
+		          length = toIndex(data);
+		          byteLength = length * BYTES;
+		          buffer = new ArrayBuffer(byteLength);
+		        } else if (isArrayBuffer(data)) {
+		          buffer = data;
+		          byteOffset = toOffset(offset, BYTES);
+		          var $len = data.byteLength;
+		          if ($length === undefined) {
+		            if ($len % BYTES) throw new RangeError(WRONG_LENGTH);
+		            byteLength = $len - byteOffset;
+		            if (byteLength < 0) throw new RangeError(WRONG_LENGTH);
+		          } else {
+		            byteLength = toLength($length) * BYTES;
+		            if (byteLength + byteOffset > $len) throw new RangeError(WRONG_LENGTH);
+		          }
+		          length = byteLength / BYTES;
+		        } else if (isTypedArray(data)) {
+		          return arrayFromConstructorAndList(TypedArrayConstructor, data);
+		        } else {
+		          return call(typedArrayFrom, TypedArrayConstructor, data);
+		        }
+		        setInternalState(that, {
+		          buffer: buffer,
+		          byteOffset: byteOffset,
+		          byteLength: byteLength,
+		          length: length,
+		          view: new DataView(buffer)
+		        });
+		        while (index < length) addElement(that, index++);
+		      });
+
+		      if (setPrototypeOf) setPrototypeOf(TypedArrayConstructor, TypedArray);
+		      TypedArrayConstructorPrototype = TypedArrayConstructor.prototype = create(TypedArrayPrototype);
+		    } else if (TYPED_ARRAYS_CONSTRUCTORS_REQUIRES_WRAPPERS) {
+		      TypedArrayConstructor = wrapper(function (dummy, data, typedArrayOffset, $length) {
+		        anInstance(dummy, TypedArrayConstructorPrototype);
+		        return inheritIfRequired(function () {
+		          if (!isObject(data)) return new NativeTypedArrayConstructor(toIndex(data));
+		          if (isArrayBuffer(data)) return $length !== undefined
+		            ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES), $length)
+		            : typedArrayOffset !== undefined
+		              ? new NativeTypedArrayConstructor(data, toOffset(typedArrayOffset, BYTES))
+		              : new NativeTypedArrayConstructor(data);
+		          if (isTypedArray(data)) return arrayFromConstructorAndList(TypedArrayConstructor, data);
+		          return call(typedArrayFrom, TypedArrayConstructor, data);
+		        }(), dummy, TypedArrayConstructor);
+		      });
+
+		      if (setPrototypeOf) setPrototypeOf(TypedArrayConstructor, TypedArray);
+		      forEach(getOwnPropertyNames(NativeTypedArrayConstructor), function (key) {
+		        if (!(key in TypedArrayConstructor)) {
+		          createNonEnumerableProperty(TypedArrayConstructor, key, NativeTypedArrayConstructor[key]);
+		        }
+		      });
+		      TypedArrayConstructor.prototype = TypedArrayConstructorPrototype;
+		    }
+
+		    if (TypedArrayConstructorPrototype.constructor !== TypedArrayConstructor) {
+		      createNonEnumerableProperty(TypedArrayConstructorPrototype, 'constructor', TypedArrayConstructor);
+		    }
+
+		    enforceInternalState(TypedArrayConstructorPrototype).TypedArrayConstructor = TypedArrayConstructor;
+
+		    if (TYPED_ARRAY_TAG) {
+		      createNonEnumerableProperty(TypedArrayConstructorPrototype, TYPED_ARRAY_TAG, CONSTRUCTOR_NAME);
+		    }
+
+		    var FORCED = TypedArrayConstructor !== NativeTypedArrayConstructor;
+
+		    exported[CONSTRUCTOR_NAME] = TypedArrayConstructor;
+
+		    $({ global: true, constructor: true, forced: FORCED, sham: !NATIVE_ARRAY_BUFFER_VIEWS }, exported);
+
+		    if (!(BYTES_PER_ELEMENT in TypedArrayConstructor)) {
+		      createNonEnumerableProperty(TypedArrayConstructor, BYTES_PER_ELEMENT, BYTES);
+		    }
+
+		    if (!(BYTES_PER_ELEMENT in TypedArrayConstructorPrototype)) {
+		      createNonEnumerableProperty(TypedArrayConstructorPrototype, BYTES_PER_ELEMENT, BYTES);
+		    }
+
+		    setSpecies(CONSTRUCTOR_NAME);
+		  };
+		} else typedArrayConstructor.exports = function () { /* empty */ };
+		return typedArrayConstructor.exports;
+	}
+
+	var hasRequiredEs_typedArray_uint8Array;
+
+	function requireEs_typedArray_uint8Array () {
+		if (hasRequiredEs_typedArray_uint8Array) return es_typedArray_uint8Array;
+		hasRequiredEs_typedArray_uint8Array = 1;
+		var createTypedArrayConstructor = requireTypedArrayConstructor();
+
+		// `Uint8Array` constructor
+		// https://tc39.es/ecma262/#sec-typedarray-objects
+		createTypedArrayConstructor('Uint8', function (init) {
+		  return function Uint8Array(data, byteOffset, length) {
+		    return init(this, data, byteOffset, length);
+		  };
+		});
+		return es_typedArray_uint8Array;
+	}
+
+	requireEs_typedArray_uint8Array();
+
+	var es_typedArray_at = {};
+
+	var hasRequiredEs_typedArray_at;
+
+	function requireEs_typedArray_at () {
+		if (hasRequiredEs_typedArray_at) return es_typedArray_at;
+		hasRequiredEs_typedArray_at = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var toIntegerOrInfinity = requireToIntegerOrInfinity();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.at` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.at
+		exportTypedArrayMethod('at', function at(index) {
+		  var O = aTypedArray(this);
+		  var len = lengthOfArrayLike(O);
+		  var relativeIndex = toIntegerOrInfinity(index);
+		  var k = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
+		  return (k < 0 || k >= len) ? undefined : O[k];
+		});
+		return es_typedArray_at;
+	}
+
+	requireEs_typedArray_at();
+
+	var es_typedArray_copyWithin = {};
+
+	var arrayCopyWithin;
+	var hasRequiredArrayCopyWithin;
+
+	function requireArrayCopyWithin () {
+		if (hasRequiredArrayCopyWithin) return arrayCopyWithin;
+		hasRequiredArrayCopyWithin = 1;
+		var toObject = requireToObject();
+		var toAbsoluteIndex = requireToAbsoluteIndex();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var deletePropertyOrThrow = requireDeletePropertyOrThrow();
+
+		var min = Math.min;
+
+		// `Array.prototype.copyWithin` method implementation
+		// https://tc39.es/ecma262/#sec-array.prototype.copywithin
+		// eslint-disable-next-line es/no-array-prototype-copywithin -- safe
+		arrayCopyWithin = [].copyWithin || function copyWithin(target /* = 0 */, start /* = 0, end = @length */) {
+		  var O = toObject(this);
+		  var len = lengthOfArrayLike(O);
+		  var to = toAbsoluteIndex(target, len);
+		  var from = toAbsoluteIndex(start, len);
+		  var end = arguments.length > 2 ? arguments[2] : undefined;
+		  var count = min((end === undefined ? len : toAbsoluteIndex(end, len)) - from, len - to);
+		  var inc = 1;
+		  if (from < to && to < from + count) {
+		    inc = -1;
+		    from += count - 1;
+		    to += count - 1;
+		  }
+		  while (count-- > 0) {
+		    if (from in O) O[to] = O[from];
+		    else deletePropertyOrThrow(O, to);
+		    to += inc;
+		    from += inc;
+		  } return O;
+		};
+		return arrayCopyWithin;
+	}
+
+	var hasRequiredEs_typedArray_copyWithin;
+
+	function requireEs_typedArray_copyWithin () {
+		if (hasRequiredEs_typedArray_copyWithin) return es_typedArray_copyWithin;
+		hasRequiredEs_typedArray_copyWithin = 1;
+		var uncurryThis = requireFunctionUncurryThis();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $ArrayCopyWithin = requireArrayCopyWithin();
+
+		var u$ArrayCopyWithin = uncurryThis($ArrayCopyWithin);
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.copyWithin` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.copywithin
+		exportTypedArrayMethod('copyWithin', function copyWithin(target, start /* , end */) {
+		  return u$ArrayCopyWithin(aTypedArray(this), target, start, arguments.length > 2 ? arguments[2] : undefined);
+		});
+		return es_typedArray_copyWithin;
+	}
+
+	requireEs_typedArray_copyWithin();
+
+	var es_typedArray_every = {};
+
+	var hasRequiredEs_typedArray_every;
+
+	function requireEs_typedArray_every () {
+		if (hasRequiredEs_typedArray_every) return es_typedArray_every;
+		hasRequiredEs_typedArray_every = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $every = requireArrayIteration().every;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.every` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.every
+		exportTypedArrayMethod('every', function every(callbackfn /* , thisArg */) {
+		  return $every(aTypedArray(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_every;
+	}
+
+	requireEs_typedArray_every();
+
+	var es_typedArray_fill = {};
+
+	var hasRequiredEs_typedArray_fill;
+
+	function requireEs_typedArray_fill () {
+		if (hasRequiredEs_typedArray_fill) return es_typedArray_fill;
+		hasRequiredEs_typedArray_fill = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $fill = requireArrayFill();
+		var toBigInt = requireToBigInt();
+		var classof = requireClassof();
+		var call = requireFunctionCall();
+		var uncurryThis = requireFunctionUncurryThis();
+		var fails = requireFails();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var slice = uncurryThis(''.slice);
+
+		// V8 ~ Chrome < 59, Safari < 14.1, FF < 55, Edge <=18
+		var CONVERSION_BUG = fails(function () {
+		  var count = 0;
+		  // eslint-disable-next-line es/no-typed-arrays -- safe
+		  new Int8Array(2).fill({ valueOf: function () { return count++; } });
+		  return count !== 1;
+		});
+
+		// `%TypedArray%.prototype.fill` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.fill
+		exportTypedArrayMethod('fill', function fill(value /* , start, end */) {
+		  var length = arguments.length;
+		  aTypedArray(this);
+		  var actualValue = slice(classof(this), 0, 3) === 'Big' ? toBigInt(value) : +value;
+		  return call($fill, this, actualValue, length > 1 ? arguments[1] : undefined, length > 2 ? arguments[2] : undefined);
+		}, CONVERSION_BUG);
+		return es_typedArray_fill;
+	}
+
+	requireEs_typedArray_fill();
+
+	var es_typedArray_filter = {};
+
+	var typedArrayFromSameTypeAndList;
+	var hasRequiredTypedArrayFromSameTypeAndList;
+
+	function requireTypedArrayFromSameTypeAndList () {
+		if (hasRequiredTypedArrayFromSameTypeAndList) return typedArrayFromSameTypeAndList;
+		hasRequiredTypedArrayFromSameTypeAndList = 1;
+		var arrayFromConstructorAndList = requireArrayFromConstructorAndList();
+		var getTypedArrayConstructor = requireArrayBufferViewCore().getTypedArrayConstructor;
+
+		typedArrayFromSameTypeAndList = function (instance, list) {
+		  return arrayFromConstructorAndList(getTypedArrayConstructor(instance), list);
+		};
+		return typedArrayFromSameTypeAndList;
+	}
+
+	var hasRequiredEs_typedArray_filter;
+
+	function requireEs_typedArray_filter () {
+		if (hasRequiredEs_typedArray_filter) return es_typedArray_filter;
+		hasRequiredEs_typedArray_filter = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $filter = requireArrayIteration().filter;
+		var fromSameTypeAndList = requireTypedArrayFromSameTypeAndList();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.filter` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.filter
+		exportTypedArrayMethod('filter', function filter(callbackfn /* , thisArg */) {
+		  var list = $filter(aTypedArray(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+		  return fromSameTypeAndList(this, list);
+		});
+		return es_typedArray_filter;
+	}
+
+	requireEs_typedArray_filter();
+
+	var es_typedArray_find = {};
+
+	var hasRequiredEs_typedArray_find;
+
+	function requireEs_typedArray_find () {
+		if (hasRequiredEs_typedArray_find) return es_typedArray_find;
+		hasRequiredEs_typedArray_find = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $find = requireArrayIteration().find;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.find` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.find
+		exportTypedArrayMethod('find', function find(predicate /* , thisArg */) {
+		  return $find(aTypedArray(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_find;
+	}
+
+	requireEs_typedArray_find();
+
+	var es_typedArray_findIndex = {};
+
+	var hasRequiredEs_typedArray_findIndex;
+
+	function requireEs_typedArray_findIndex () {
+		if (hasRequiredEs_typedArray_findIndex) return es_typedArray_findIndex;
+		hasRequiredEs_typedArray_findIndex = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $findIndex = requireArrayIteration().findIndex;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.findIndex` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.findindex
+		exportTypedArrayMethod('findIndex', function findIndex(predicate /* , thisArg */) {
+		  return $findIndex(aTypedArray(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_findIndex;
+	}
+
+	requireEs_typedArray_findIndex();
+
+	var es_typedArray_findLast = {};
+
+	var arrayIterationFromLast;
+	var hasRequiredArrayIterationFromLast;
+
+	function requireArrayIterationFromLast () {
+		if (hasRequiredArrayIterationFromLast) return arrayIterationFromLast;
+		hasRequiredArrayIterationFromLast = 1;
+		var bind = requireFunctionBindContext();
+		var IndexedObject = requireIndexedObject();
+		var toObject = requireToObject();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+
+		// `Array.prototype.{ findLast, findLastIndex }` methods implementation
+		var createMethod = function (TYPE) {
+		  var IS_FIND_LAST_INDEX = TYPE === 1;
+		  return function ($this, callbackfn, that) {
+		    var O = toObject($this);
+		    var self = IndexedObject(O);
+		    var index = lengthOfArrayLike(self);
+		    var boundFunction = bind(callbackfn, that);
+		    var value, result;
+		    while (index-- > 0) {
+		      value = self[index];
+		      result = boundFunction(value, index, O);
+		      if (result) switch (TYPE) {
+		        case 0: return value; // findLast
+		        case 1: return index; // findLastIndex
+		      }
+		    }
+		    return IS_FIND_LAST_INDEX ? -1 : undefined;
+		  };
+		};
+
+		arrayIterationFromLast = {
+		  // `Array.prototype.findLast` method
+		  // https://github.com/tc39/proposal-array-find-from-last
+		  findLast: createMethod(0),
+		  // `Array.prototype.findLastIndex` method
+		  // https://github.com/tc39/proposal-array-find-from-last
+		  findLastIndex: createMethod(1)
+		};
+		return arrayIterationFromLast;
+	}
+
+	var hasRequiredEs_typedArray_findLast;
+
+	function requireEs_typedArray_findLast () {
+		if (hasRequiredEs_typedArray_findLast) return es_typedArray_findLast;
+		hasRequiredEs_typedArray_findLast = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $findLast = requireArrayIterationFromLast().findLast;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.findLast` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.findlast
+		exportTypedArrayMethod('findLast', function findLast(predicate /* , thisArg */) {
+		  return $findLast(aTypedArray(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_findLast;
+	}
+
+	requireEs_typedArray_findLast();
+
+	var es_typedArray_findLastIndex = {};
+
+	var hasRequiredEs_typedArray_findLastIndex;
+
+	function requireEs_typedArray_findLastIndex () {
+		if (hasRequiredEs_typedArray_findLastIndex) return es_typedArray_findLastIndex;
+		hasRequiredEs_typedArray_findLastIndex = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $findLastIndex = requireArrayIterationFromLast().findLastIndex;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.findLastIndex` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.findlastindex
+		exportTypedArrayMethod('findLastIndex', function findLastIndex(predicate /* , thisArg */) {
+		  return $findLastIndex(aTypedArray(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_findLastIndex;
+	}
+
+	requireEs_typedArray_findLastIndex();
+
+	var es_typedArray_forEach = {};
+
+	var hasRequiredEs_typedArray_forEach;
+
+	function requireEs_typedArray_forEach () {
+		if (hasRequiredEs_typedArray_forEach) return es_typedArray_forEach;
+		hasRequiredEs_typedArray_forEach = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $forEach = requireArrayIteration().forEach;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.forEach` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.foreach
+		exportTypedArrayMethod('forEach', function forEach(callbackfn /* , thisArg */) {
+		  $forEach(aTypedArray(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_forEach;
+	}
+
+	requireEs_typedArray_forEach();
+
+	var es_typedArray_includes = {};
+
+	var hasRequiredEs_typedArray_includes;
+
+	function requireEs_typedArray_includes () {
+		if (hasRequiredEs_typedArray_includes) return es_typedArray_includes;
+		hasRequiredEs_typedArray_includes = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $includes = requireArrayIncludes().includes;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.includes` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.includes
+		exportTypedArrayMethod('includes', function includes(searchElement /* , fromIndex */) {
+		  return $includes(aTypedArray(this), searchElement, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_includes;
+	}
+
+	requireEs_typedArray_includes();
+
+	var es_typedArray_indexOf = {};
+
+	var hasRequiredEs_typedArray_indexOf;
+
+	function requireEs_typedArray_indexOf () {
+		if (hasRequiredEs_typedArray_indexOf) return es_typedArray_indexOf;
+		hasRequiredEs_typedArray_indexOf = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $indexOf = requireArrayIncludes().indexOf;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.indexOf` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.indexof
+		exportTypedArrayMethod('indexOf', function indexOf(searchElement /* , fromIndex */) {
+		  return $indexOf(aTypedArray(this), searchElement, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_indexOf;
+	}
+
+	requireEs_typedArray_indexOf();
+
+	var es_typedArray_iterator = {};
+
+	var hasRequiredEs_typedArray_iterator;
+
+	function requireEs_typedArray_iterator () {
+		if (hasRequiredEs_typedArray_iterator) return es_typedArray_iterator;
+		hasRequiredEs_typedArray_iterator = 1;
+		var globalThis = requireGlobalThis();
+		var fails = requireFails();
+		var uncurryThis = requireFunctionUncurryThis();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var ArrayIterators = requireEs_array_iterator();
+		var wellKnownSymbol = requireWellKnownSymbol();
+
+		var ITERATOR = wellKnownSymbol('iterator');
+		var Uint8Array = globalThis.Uint8Array;
+		var arrayValues = uncurryThis(ArrayIterators.values);
+		var arrayKeys = uncurryThis(ArrayIterators.keys);
+		var arrayEntries = uncurryThis(ArrayIterators.entries);
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var TypedArrayPrototype = Uint8Array && Uint8Array.prototype;
+
+		var GENERIC = !fails(function () {
+		  TypedArrayPrototype[ITERATOR].call([1]);
+		});
+
+		var ITERATOR_IS_VALUES = !!TypedArrayPrototype
+		  && TypedArrayPrototype.values
+		  && TypedArrayPrototype[ITERATOR] === TypedArrayPrototype.values
+		  && TypedArrayPrototype.values.name === 'values';
+
+		var typedArrayValues = function values() {
+		  return arrayValues(aTypedArray(this));
+		};
+
+		// `%TypedArray%.prototype.entries` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.entries
+		exportTypedArrayMethod('entries', function entries() {
+		  return arrayEntries(aTypedArray(this));
+		}, GENERIC);
+		// `%TypedArray%.prototype.keys` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.keys
+		exportTypedArrayMethod('keys', function keys() {
+		  return arrayKeys(aTypedArray(this));
+		}, GENERIC);
+		// `%TypedArray%.prototype.values` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.values
+		exportTypedArrayMethod('values', typedArrayValues, GENERIC || !ITERATOR_IS_VALUES, { name: 'values' });
+		// `%TypedArray%.prototype[@@iterator]` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype-@@iterator
+		exportTypedArrayMethod(ITERATOR, typedArrayValues, GENERIC || !ITERATOR_IS_VALUES, { name: 'values' });
+		return es_typedArray_iterator;
+	}
+
+	requireEs_typedArray_iterator();
+
+	var es_typedArray_join = {};
+
+	var hasRequiredEs_typedArray_join;
+
+	function requireEs_typedArray_join () {
+		if (hasRequiredEs_typedArray_join) return es_typedArray_join;
+		hasRequiredEs_typedArray_join = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var uncurryThis = requireFunctionUncurryThis();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var $join = uncurryThis([].join);
+
+		// `%TypedArray%.prototype.join` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.join
+		exportTypedArrayMethod('join', function join(separator) {
+		  return $join(aTypedArray(this), separator);
+		});
+		return es_typedArray_join;
+	}
+
+	requireEs_typedArray_join();
+
+	var es_typedArray_lastIndexOf = {};
+
+	var arrayLastIndexOf;
+	var hasRequiredArrayLastIndexOf;
+
+	function requireArrayLastIndexOf () {
+		if (hasRequiredArrayLastIndexOf) return arrayLastIndexOf;
+		hasRequiredArrayLastIndexOf = 1;
+		/* eslint-disable es/no-array-prototype-lastindexof -- safe */
+		var apply = requireFunctionApply();
+		var toIndexedObject = requireToIndexedObject();
+		var toIntegerOrInfinity = requireToIntegerOrInfinity();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+		var min = Math.min;
+		var $lastIndexOf = [].lastIndexOf;
+		var NEGATIVE_ZERO = !!$lastIndexOf && 1 / [1].lastIndexOf(1, -0) < 0;
+		var STRICT_METHOD = arrayMethodIsStrict('lastIndexOf');
+		var FORCED = NEGATIVE_ZERO || !STRICT_METHOD;
+
+		// `Array.prototype.lastIndexOf` method implementation
+		// https://tc39.es/ecma262/#sec-array.prototype.lastindexof
+		arrayLastIndexOf = FORCED ? function lastIndexOf(searchElement /* , fromIndex = @[*-1] */) {
+		  // convert -0 to +0
+		  if (NEGATIVE_ZERO) return apply($lastIndexOf, this, arguments) || 0;
+		  var O = toIndexedObject(this);
+		  var length = lengthOfArrayLike(O);
+		  if (length === 0) return -1;
+		  var index = length - 1;
+		  if (arguments.length > 1) index = min(index, toIntegerOrInfinity(arguments[1]));
+		  if (index < 0) index = length + index;
+		  for (;index >= 0; index--) if (index in O && O[index] === searchElement) return index || 0;
+		  return -1;
+		} : $lastIndexOf;
+		return arrayLastIndexOf;
+	}
+
+	var hasRequiredEs_typedArray_lastIndexOf;
+
+	function requireEs_typedArray_lastIndexOf () {
+		if (hasRequiredEs_typedArray_lastIndexOf) return es_typedArray_lastIndexOf;
+		hasRequiredEs_typedArray_lastIndexOf = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var apply = requireFunctionApply();
+		var $lastIndexOf = requireArrayLastIndexOf();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.lastIndexOf` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.lastindexof
+		exportTypedArrayMethod('lastIndexOf', function lastIndexOf(searchElement /* , fromIndex */) {
+		  var length = arguments.length;
+		  return apply($lastIndexOf, aTypedArray(this), length > 1 ? [searchElement, arguments[1]] : [searchElement]);
+		});
+		return es_typedArray_lastIndexOf;
+	}
+
+	requireEs_typedArray_lastIndexOf();
+
+	var es_typedArray_map = {};
+
+	var hasRequiredEs_typedArray_map;
+
+	function requireEs_typedArray_map () {
+		if (hasRequiredEs_typedArray_map) return es_typedArray_map;
+		hasRequiredEs_typedArray_map = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $map = requireArrayIteration().map;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.map` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.map
+		exportTypedArrayMethod('map', function map(mapfn /* , thisArg */) {
+		  return $map(aTypedArray(this), mapfn, arguments.length > 1 ? arguments[1] : undefined, function (O, length) {
+		    return new (getTypedArrayConstructor(O))(length);
+		  });
+		});
+		return es_typedArray_map;
+	}
+
+	requireEs_typedArray_map();
+
+	var es_typedArray_reduce = {};
+
+	var arrayReduce;
+	var hasRequiredArrayReduce;
+
+	function requireArrayReduce () {
+		if (hasRequiredArrayReduce) return arrayReduce;
+		hasRequiredArrayReduce = 1;
+		var aCallable = requireACallable();
+		var toObject = requireToObject();
+		var IndexedObject = requireIndexedObject();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+
+		var $TypeError = TypeError;
+
+		var REDUCE_EMPTY = 'Reduce of empty array with no initial value';
+
+		// `Array.prototype.{ reduce, reduceRight }` methods implementation
+		var createMethod = function (IS_RIGHT) {
+		  return function (that, callbackfn, argumentsLength, memo) {
+		    var O = toObject(that);
+		    var self = IndexedObject(O);
+		    var length = lengthOfArrayLike(O);
+		    aCallable(callbackfn);
+		    if (length === 0 && argumentsLength < 2) throw new $TypeError(REDUCE_EMPTY);
+		    var index = IS_RIGHT ? length - 1 : 0;
+		    var i = IS_RIGHT ? -1 : 1;
+		    if (argumentsLength < 2) while (true) {
+		      if (index in self) {
+		        memo = self[index];
+		        index += i;
+		        break;
+		      }
+		      index += i;
+		      if (IS_RIGHT ? index < 0 : length <= index) {
+		        throw new $TypeError(REDUCE_EMPTY);
+		      }
+		    }
+		    for (;IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+		      memo = callbackfn(memo, self[index], index, O);
+		    }
+		    return memo;
+		  };
+		};
+
+		arrayReduce = {
+		  // `Array.prototype.reduce` method
+		  // https://tc39.es/ecma262/#sec-array.prototype.reduce
+		  left: createMethod(false),
+		  // `Array.prototype.reduceRight` method
+		  // https://tc39.es/ecma262/#sec-array.prototype.reduceright
+		  right: createMethod(true)
+		};
+		return arrayReduce;
+	}
+
+	var hasRequiredEs_typedArray_reduce;
+
+	function requireEs_typedArray_reduce () {
+		if (hasRequiredEs_typedArray_reduce) return es_typedArray_reduce;
+		hasRequiredEs_typedArray_reduce = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $reduce = requireArrayReduce().left;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.reduce` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.reduce
+		exportTypedArrayMethod('reduce', function reduce(callbackfn /* , initialValue */) {
+		  var length = arguments.length;
+		  return $reduce(aTypedArray(this), callbackfn, length, length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_reduce;
+	}
+
+	requireEs_typedArray_reduce();
+
+	var es_typedArray_reduceRight = {};
+
+	var hasRequiredEs_typedArray_reduceRight;
+
+	function requireEs_typedArray_reduceRight () {
+		if (hasRequiredEs_typedArray_reduceRight) return es_typedArray_reduceRight;
+		hasRequiredEs_typedArray_reduceRight = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $reduceRight = requireArrayReduce().right;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.reduceRight` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.reduceright
+		exportTypedArrayMethod('reduceRight', function reduceRight(callbackfn /* , initialValue */) {
+		  var length = arguments.length;
+		  return $reduceRight(aTypedArray(this), callbackfn, length, length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_reduceRight;
+	}
+
+	requireEs_typedArray_reduceRight();
+
+	var es_typedArray_reverse = {};
+
+	var hasRequiredEs_typedArray_reverse;
+
+	function requireEs_typedArray_reverse () {
+		if (hasRequiredEs_typedArray_reverse) return es_typedArray_reverse;
+		hasRequiredEs_typedArray_reverse = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var floor = Math.floor;
+
+		// `%TypedArray%.prototype.reverse` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.reverse
+		exportTypedArrayMethod('reverse', function reverse() {
+		  var that = this;
+		  var length = aTypedArray(that).length;
+		  var middle = floor(length / 2);
+		  var index = 0;
+		  var value;
+		  while (index < middle) {
+		    value = that[index];
+		    that[index++] = that[--length];
+		    that[length] = value;
+		  } return that;
+		});
+		return es_typedArray_reverse;
+	}
+
+	requireEs_typedArray_reverse();
+
+	var es_typedArray_set = {};
+
+	var hasRequiredEs_typedArray_set;
+
+	function requireEs_typedArray_set () {
+		if (hasRequiredEs_typedArray_set) return es_typedArray_set;
+		hasRequiredEs_typedArray_set = 1;
+		var globalThis = requireGlobalThis();
+		var call = requireFunctionCall();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var toOffset = requireToOffset();
+		var toIndexedObject = requireToObject();
+		var fails = requireFails();
+
+		var RangeError = globalThis.RangeError;
+		var Int8Array = globalThis.Int8Array;
+		var Int8ArrayPrototype = Int8Array && Int8Array.prototype;
+		var $set = Int8ArrayPrototype && Int8ArrayPrototype.set;
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		var WORKS_WITH_OBJECTS_AND_GENERIC_ON_TYPED_ARRAYS = !fails(function () {
+		  // eslint-disable-next-line es/no-typed-arrays -- required for testing
+		  var array = new Uint8ClampedArray(2);
+		  call($set, array, { length: 1, 0: 3 }, 1);
+		  return array[1] !== 3;
+		});
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=11294 and other
+		var TO_OBJECT_BUG = WORKS_WITH_OBJECTS_AND_GENERIC_ON_TYPED_ARRAYS && ArrayBufferViewCore.NATIVE_ARRAY_BUFFER_VIEWS && fails(function () {
+		  var array = new Int8Array(2);
+		  array.set(1);
+		  array.set('2', 1);
+		  return array[0] !== 0 || array[1] !== 2;
+		});
+
+		// `%TypedArray%.prototype.set` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.set
+		exportTypedArrayMethod('set', function set(arrayLike /* , offset */) {
+		  aTypedArray(this);
+		  var offset = toOffset(arguments.length > 1 ? arguments[1] : undefined, 1);
+		  var src = toIndexedObject(arrayLike);
+		  if (WORKS_WITH_OBJECTS_AND_GENERIC_ON_TYPED_ARRAYS) return call($set, this, src, offset);
+		  var length = this.length;
+		  var len = lengthOfArrayLike(src);
+		  var index = 0;
+		  if (len + offset > length) throw new RangeError('Wrong length');
+		  while (index < len) this[offset + index] = src[index++];
+		}, !WORKS_WITH_OBJECTS_AND_GENERIC_ON_TYPED_ARRAYS || TO_OBJECT_BUG);
+		return es_typedArray_set;
+	}
+
+	requireEs_typedArray_set();
+
+	var es_typedArray_slice = {};
+
+	var hasRequiredEs_typedArray_slice;
+
+	function requireEs_typedArray_slice () {
+		if (hasRequiredEs_typedArray_slice) return es_typedArray_slice;
+		hasRequiredEs_typedArray_slice = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var fails = requireFails();
+		var arraySlice = requireArraySlice();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		var FORCED = fails(function () {
+		  // eslint-disable-next-line es/no-typed-arrays -- required for testing
+		  new Int8Array(1).slice();
+		});
+
+		// `%TypedArray%.prototype.slice` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.slice
+		exportTypedArrayMethod('slice', function slice(start, end) {
+		  var list = arraySlice(aTypedArray(this), start, end);
+		  var C = getTypedArrayConstructor(this);
+		  var index = 0;
+		  var length = list.length;
+		  var result = new C(length);
+		  while (length > index) result[index] = list[index++];
+		  return result;
+		}, FORCED);
+		return es_typedArray_slice;
+	}
+
+	requireEs_typedArray_slice();
+
+	var es_typedArray_some = {};
+
+	var hasRequiredEs_typedArray_some;
+
+	function requireEs_typedArray_some () {
+		if (hasRequiredEs_typedArray_some) return es_typedArray_some;
+		hasRequiredEs_typedArray_some = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var $some = requireArrayIteration().some;
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.some` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.some
+		exportTypedArrayMethod('some', function some(callbackfn /* , thisArg */) {
+		  return $some(aTypedArray(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+		});
+		return es_typedArray_some;
+	}
+
+	requireEs_typedArray_some();
+
+	var es_typedArray_sort = {};
+
+	var hasRequiredEs_typedArray_sort;
+
+	function requireEs_typedArray_sort () {
+		if (hasRequiredEs_typedArray_sort) return es_typedArray_sort;
+		hasRequiredEs_typedArray_sort = 1;
+		var globalThis = requireGlobalThis();
+		var uncurryThis = requireFunctionUncurryThisClause();
+		var fails = requireFails();
+		var aCallable = requireACallable();
+		var internalSort = requireArraySort();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var FF = requireEnvironmentFfVersion();
+		var IE_OR_EDGE = requireEnvironmentIsIeOrEdge();
+		var V8 = requireEnvironmentV8Version();
+		var WEBKIT = requireEnvironmentWebkitVersion();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var Uint16Array = globalThis.Uint16Array;
+		var nativeSort = Uint16Array && uncurryThis(Uint16Array.prototype.sort);
+
+		// WebKit
+		var ACCEPT_INCORRECT_ARGUMENTS = !!nativeSort && !(fails(function () {
+		  nativeSort(new Uint16Array(2), null);
+		}) && fails(function () {
+		  nativeSort(new Uint16Array(2), {});
+		}));
+
+		var STABLE_SORT = !!nativeSort && !fails(function () {
+		  // feature detection can be too slow, so check engines versions
+		  if (V8) return V8 < 74;
+		  if (FF) return FF < 67;
+		  if (IE_OR_EDGE) return true;
+		  if (WEBKIT) return WEBKIT < 602;
+
+		  var array = new Uint16Array(516);
+		  var expected = Array(516);
+		  var index, mod;
+
+		  for (index = 0; index < 516; index++) {
+		    mod = index % 4;
+		    array[index] = 515 - index;
+		    expected[index] = index - 2 * mod + 3;
+		  }
+
+		  nativeSort(array, function (a, b) {
+		    return (a / 4 | 0) - (b / 4 | 0);
+		  });
+
+		  for (index = 0; index < 516; index++) {
+		    if (array[index] !== expected[index]) return true;
+		  }
+		});
+
+		var getSortCompare = function (comparefn) {
+		  return function (x, y) {
+		    if (comparefn !== undefined) return +comparefn(x, y) || 0;
+		    // eslint-disable-next-line no-self-compare -- NaN check
+		    if (y !== y) return -1;
+		    // eslint-disable-next-line no-self-compare -- NaN check
+		    if (x !== x) return 1;
+		    if (x === 0 && y === 0) return 1 / x > 0 && 1 / y < 0 ? 1 : -1;
+		    return x > y;
+		  };
+		};
+
+		// `%TypedArray%.prototype.sort` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.sort
+		exportTypedArrayMethod('sort', function sort(comparefn) {
+		  if (comparefn !== undefined) aCallable(comparefn);
+		  if (STABLE_SORT) return nativeSort(this, comparefn);
+
+		  return internalSort(aTypedArray(this), getSortCompare(comparefn));
+		}, !STABLE_SORT || ACCEPT_INCORRECT_ARGUMENTS);
+		return es_typedArray_sort;
+	}
+
+	requireEs_typedArray_sort();
+
+	var es_typedArray_subarray = {};
+
+	var hasRequiredEs_typedArray_subarray;
+
+	function requireEs_typedArray_subarray () {
+		if (hasRequiredEs_typedArray_subarray) return es_typedArray_subarray;
+		hasRequiredEs_typedArray_subarray = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var toLength = requireToLength();
+		var toAbsoluteIndex = requireToAbsoluteIndex();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		// `%TypedArray%.prototype.subarray` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.subarray
+		exportTypedArrayMethod('subarray', function subarray(begin, end) {
+		  var O = aTypedArray(this);
+		  var length = O.length;
+		  var beginIndex = toAbsoluteIndex(begin, length);
+		  var C = getTypedArrayConstructor(O);
+		  return new C(
+		    O.buffer,
+		    O.byteOffset + beginIndex * O.BYTES_PER_ELEMENT,
+		    toLength((end === undefined ? length : toAbsoluteIndex(end, length)) - beginIndex)
+		  );
+		});
+		return es_typedArray_subarray;
+	}
+
+	requireEs_typedArray_subarray();
+
+	var es_typedArray_toLocaleString = {};
+
+	var hasRequiredEs_typedArray_toLocaleString;
+
+	function requireEs_typedArray_toLocaleString () {
+		if (hasRequiredEs_typedArray_toLocaleString) return es_typedArray_toLocaleString;
+		hasRequiredEs_typedArray_toLocaleString = 1;
+		var globalThis = requireGlobalThis();
+		var apply = requireFunctionApply();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var fails = requireFails();
+		var arraySlice = requireArraySlice();
+
+		var Int8Array = globalThis.Int8Array;
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var $toLocaleString = [].toLocaleString;
+
+		// iOS Safari 6.x fails here
+		var TO_LOCALE_STRING_BUG = !!Int8Array && fails(function () {
+		  $toLocaleString.call(new Int8Array(1));
+		});
+
+		var FORCED = fails(function () {
+		  return [1, 2].toLocaleString() !== new Int8Array([1, 2]).toLocaleString();
+		}) || !fails(function () {
+		  Int8Array.prototype.toLocaleString.call([1, 2]);
+		});
+
+		// `%TypedArray%.prototype.toLocaleString` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.tolocalestring
+		exportTypedArrayMethod('toLocaleString', function toLocaleString() {
+		  return apply(
+		    $toLocaleString,
+		    TO_LOCALE_STRING_BUG ? arraySlice(aTypedArray(this)) : aTypedArray(this),
+		    arraySlice(arguments)
+		  );
+		}, FORCED);
+		return es_typedArray_toLocaleString;
+	}
+
+	requireEs_typedArray_toLocaleString();
+
+	var es_typedArray_toReversed = {};
+
+	var hasRequiredEs_typedArray_toReversed;
+
+	function requireEs_typedArray_toReversed () {
+		if (hasRequiredEs_typedArray_toReversed) return es_typedArray_toReversed;
+		hasRequiredEs_typedArray_toReversed = 1;
+		var arrayToReversed = requireArrayToReversed();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+
+		// `%TypedArray%.prototype.toReversed` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.toreversed
+		exportTypedArrayMethod('toReversed', function toReversed() {
+		  return arrayToReversed(aTypedArray(this), getTypedArrayConstructor(this));
+		});
+		return es_typedArray_toReversed;
+	}
+
+	requireEs_typedArray_toReversed();
+
+	var es_typedArray_toSorted = {};
+
+	var hasRequiredEs_typedArray_toSorted;
+
+	function requireEs_typedArray_toSorted () {
+		if (hasRequiredEs_typedArray_toSorted) return es_typedArray_toSorted;
+		hasRequiredEs_typedArray_toSorted = 1;
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var uncurryThis = requireFunctionUncurryThis();
+		var aCallable = requireACallable();
+		var arrayFromConstructorAndList = requireArrayFromConstructorAndList();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+		var sort = uncurryThis(ArrayBufferViewCore.TypedArrayPrototype.sort);
+
+		// `%TypedArray%.prototype.toSorted` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.tosorted
+		exportTypedArrayMethod('toSorted', function toSorted(compareFn) {
+		  if (compareFn !== undefined) aCallable(compareFn);
+		  var O = aTypedArray(this);
+		  var A = arrayFromConstructorAndList(getTypedArrayConstructor(O), O);
+		  return sort(A, compareFn);
+		});
+		return es_typedArray_toSorted;
+	}
+
+	requireEs_typedArray_toSorted();
+
+	var es_typedArray_toString = {};
+
+	var hasRequiredEs_typedArray_toString;
+
+	function requireEs_typedArray_toString () {
+		if (hasRequiredEs_typedArray_toString) return es_typedArray_toString;
+		hasRequiredEs_typedArray_toString = 1;
+		var exportTypedArrayMethod = requireArrayBufferViewCore().exportTypedArrayMethod;
+		var fails = requireFails();
+		var globalThis = requireGlobalThis();
+		var uncurryThis = requireFunctionUncurryThis();
+
+		var Uint8Array = globalThis.Uint8Array;
+		var Uint8ArrayPrototype = Uint8Array && Uint8Array.prototype || {};
+		var arrayToString = [].toString;
+		var join = uncurryThis([].join);
+
+		if (fails(function () { arrayToString.call({}); })) {
+		  arrayToString = function toString() {
+		    return join(this);
+		  };
+		}
+
+		var IS_NOT_ARRAY_METHOD = Uint8ArrayPrototype.toString !== arrayToString;
+
+		// `%TypedArray%.prototype.toString` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.tostring
+		exportTypedArrayMethod('toString', arrayToString, IS_NOT_ARRAY_METHOD);
+		return es_typedArray_toString;
+	}
+
+	requireEs_typedArray_toString();
+
+	var es_typedArray_with = {};
+
+	var arrayWith;
+	var hasRequiredArrayWith;
+
+	function requireArrayWith () {
+		if (hasRequiredArrayWith) return arrayWith;
+		hasRequiredArrayWith = 1;
+		var lengthOfArrayLike = requireLengthOfArrayLike();
+		var toIntegerOrInfinity = requireToIntegerOrInfinity();
+
+		var $RangeError = RangeError;
+
+		// https://tc39.es/proposal-change-array-by-copy/#sec-array.prototype.with
+		// https://tc39.es/proposal-change-array-by-copy/#sec-%typedarray%.prototype.with
+		arrayWith = function (O, C, index, value) {
+		  var len = lengthOfArrayLike(O);
+		  var relativeIndex = toIntegerOrInfinity(index);
+		  var actualIndex = relativeIndex < 0 ? len + relativeIndex : relativeIndex;
+		  if (actualIndex >= len || actualIndex < 0) throw new $RangeError('Incorrect index');
+		  var A = new C(len);
+		  var k = 0;
+		  for (; k < len; k++) A[k] = k === actualIndex ? value : O[k];
+		  return A;
+		};
+		return arrayWith;
+	}
+
+	var hasRequiredEs_typedArray_with;
+
+	function requireEs_typedArray_with () {
+		if (hasRequiredEs_typedArray_with) return es_typedArray_with;
+		hasRequiredEs_typedArray_with = 1;
+		var arrayWith = requireArrayWith();
+		var ArrayBufferViewCore = requireArrayBufferViewCore();
+		var isBigIntArray = requireIsBigIntArray();
+		var toIntegerOrInfinity = requireToIntegerOrInfinity();
+		var toBigInt = requireToBigInt();
+
+		var aTypedArray = ArrayBufferViewCore.aTypedArray;
+		var getTypedArrayConstructor = ArrayBufferViewCore.getTypedArrayConstructor;
+		var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
+
+		var PROPER_ORDER = !!function () {
+		  try {
+		    // eslint-disable-next-line no-throw-literal, es/no-typed-arrays, es/no-array-prototype-with -- required for testing
+		    new Int8Array(1)['with'](2, { valueOf: function () { throw 8; } });
+		  } catch (error) {
+		    // some early implementations, like WebKit, does not follow the final semantic
+		    // https://github.com/tc39/proposal-change-array-by-copy/pull/86
+		    return error === 8;
+		  }
+		}();
+
+		// `%TypedArray%.prototype.with` method
+		// https://tc39.es/ecma262/#sec-%typedarray%.prototype.with
+		exportTypedArrayMethod('with', { 'with': function (index, value) {
+		  var O = aTypedArray(this);
+		  var relativeIndex = toIntegerOrInfinity(index);
+		  var actualValue = isBigIntArray(O) ? toBigInt(value) : +value;
+		  return arrayWith(O, getTypedArrayConstructor(O), relativeIndex, actualValue);
+		} }['with'], !PROPER_ORDER);
+		return es_typedArray_with;
+	}
+
+	requireEs_typedArray_with();
 
 	var es_weakMap = {};
 
@@ -12973,6 +14944,46 @@
 
 	requireEsnext_iterator_some();
 
+	var esnext_iterator_toArray = {};
+
+	var es_iterator_toArray = {};
+
+	var hasRequiredEs_iterator_toArray;
+
+	function requireEs_iterator_toArray () {
+		if (hasRequiredEs_iterator_toArray) return es_iterator_toArray;
+		hasRequiredEs_iterator_toArray = 1;
+		var $ = require_export();
+		var anObject = requireAnObject();
+		var iterate = requireIterate();
+		var getIteratorDirect = requireGetIteratorDirect();
+
+		var push = [].push;
+
+		// `Iterator.prototype.toArray` method
+		// https://tc39.es/ecma262/#sec-iterator.prototype.toarray
+		$({ target: 'Iterator', proto: true, real: true }, {
+		  toArray: function toArray() {
+		    var result = [];
+		    iterate(getIteratorDirect(anObject(this)), push, { that: result, IS_RECORD: true });
+		    return result;
+		  }
+		});
+		return es_iterator_toArray;
+	}
+
+	var hasRequiredEsnext_iterator_toArray;
+
+	function requireEsnext_iterator_toArray () {
+		if (hasRequiredEsnext_iterator_toArray) return esnext_iterator_toArray;
+		hasRequiredEsnext_iterator_toArray = 1;
+		// TODO: Remove from `core-js@4`
+		requireEs_iterator_toArray();
+		return esnext_iterator_toArray;
+	}
+
+	requireEsnext_iterator_toArray();
+
 	var esnext_json_parse = {};
 
 	var parseJsonString;
@@ -13299,6 +15310,95 @@
 
 	requireEsnext_json_parse();
 
+	var web_btoa = {};
+
+	var base64Map;
+	var hasRequiredBase64Map;
+
+	function requireBase64Map () {
+		if (hasRequiredBase64Map) return base64Map;
+		hasRequiredBase64Map = 1;
+		var commonAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		var base64Alphabet = commonAlphabet + '+/';
+		var base64UrlAlphabet = commonAlphabet + '-_';
+
+		var inverse = function (characters) {
+		  // TODO: use `Object.create(null)` in `core-js@4`
+		  var result = {};
+		  var index = 0;
+		  for (; index < 64; index++) result[characters.charAt(index)] = index;
+		  return result;
+		};
+
+		base64Map = {
+		  i2c: base64Alphabet,
+		  c2i: inverse(base64Alphabet),
+		  i2cUrl: base64UrlAlphabet,
+		  c2iUrl: inverse(base64UrlAlphabet)
+		};
+		return base64Map;
+	}
+
+	var hasRequiredWeb_btoa;
+
+	function requireWeb_btoa () {
+		if (hasRequiredWeb_btoa) return web_btoa;
+		hasRequiredWeb_btoa = 1;
+		var $ = require_export();
+		var globalThis = requireGlobalThis();
+		var getBuiltIn = requireGetBuiltIn();
+		var uncurryThis = requireFunctionUncurryThis();
+		var call = requireFunctionCall();
+		var fails = requireFails();
+		var toString = requireToString();
+		var validateArgumentsLength = requireValidateArgumentsLength();
+		var i2c = requireBase64Map().i2c;
+
+		var $btoa = getBuiltIn('btoa');
+		var charAt = uncurryThis(''.charAt);
+		var charCodeAt = uncurryThis(''.charCodeAt);
+
+		var BASIC = !!$btoa && !fails(function () {
+		  return $btoa('hi') !== 'aGk=';
+		});
+
+		var NO_ARG_RECEIVING_CHECK = BASIC && !fails(function () {
+		  $btoa();
+		});
+
+		var WRONG_ARG_CONVERSION = BASIC && fails(function () {
+		  return $btoa(null) !== 'bnVsbA==';
+		});
+
+		var WRONG_ARITY = BASIC && $btoa.length !== 1;
+
+		// `btoa` method
+		// https://html.spec.whatwg.org/multipage/webappapis.html#dom-btoa
+		$({ global: true, bind: true, enumerable: true, forced: !BASIC || NO_ARG_RECEIVING_CHECK || WRONG_ARG_CONVERSION || WRONG_ARITY }, {
+		  btoa: function btoa(data) {
+		    validateArgumentsLength(arguments.length, 1);
+		    // `webpack` dev server bug on IE global methods - use call(fn, global, ...)
+		    if (BASIC) return call($btoa, globalThis, toString(data));
+		    var string = toString(data);
+		    var output = '';
+		    var position = 0;
+		    var map = i2c;
+		    var block, charCode;
+		    while (charAt(string, position) || (map = '=', position % 1)) {
+		      charCode = charCodeAt(string, position += 3 / 4);
+		      if (charCode > 0xFF) {
+		        throw new (getBuiltIn('DOMException'))('The string contains characters outside of the Latin1 range', 'InvalidCharacterError');
+		      }
+		      block = block << 8 | charCode;
+		      output += charAt(map, 63 & block >> 8 - position % 1 * 8);
+		    } return output;
+		  }
+		});
+		return web_btoa;
+	}
+
+	requireWeb_btoa();
+
 	var web_domCollections_forEach = {};
 
 	var domIterables;
@@ -13460,6 +15560,369 @@
 	}
 
 	requireWeb_domCollections_iterator();
+
+	var web_domException_constructor = {};
+
+	var errorToString;
+	var hasRequiredErrorToString;
+
+	function requireErrorToString () {
+		if (hasRequiredErrorToString) return errorToString;
+		hasRequiredErrorToString = 1;
+		var DESCRIPTORS = requireDescriptors();
+		var fails = requireFails();
+		var anObject = requireAnObject();
+		var normalizeStringArgument = requireNormalizeStringArgument();
+
+		var nativeErrorToString = Error.prototype.toString;
+
+		var INCORRECT_TO_STRING = fails(function () {
+		  if (DESCRIPTORS) {
+		    // Chrome 32- incorrectly call accessor
+		    // eslint-disable-next-line es/no-object-create, es/no-object-defineproperty -- safe
+		    var object = Object.create(Object.defineProperty({}, 'name', { get: function () {
+		      return this === object;
+		    } }));
+		    if (nativeErrorToString.call(object) !== 'true') return true;
+		  }
+		  // FF10- does not properly handle non-strings
+		  return nativeErrorToString.call({ message: 1, name: 2 }) !== '2: 1'
+		    // IE8 does not properly handle defaults
+		    || nativeErrorToString.call({}) !== 'Error';
+		});
+
+		errorToString = INCORRECT_TO_STRING ? function toString() {
+		  var O = anObject(this);
+		  var name = normalizeStringArgument(O.name, 'Error');
+		  var message = normalizeStringArgument(O.message);
+		  return !name ? message : !message ? name : name + ': ' + message;
+		} : nativeErrorToString;
+		return errorToString;
+	}
+
+	var domExceptionConstants;
+	var hasRequiredDomExceptionConstants;
+
+	function requireDomExceptionConstants () {
+		if (hasRequiredDomExceptionConstants) return domExceptionConstants;
+		hasRequiredDomExceptionConstants = 1;
+		domExceptionConstants = {
+		  IndexSizeError: { s: 'INDEX_SIZE_ERR', c: 1, m: 1 },
+		  DOMStringSizeError: { s: 'DOMSTRING_SIZE_ERR', c: 2, m: 0 },
+		  HierarchyRequestError: { s: 'HIERARCHY_REQUEST_ERR', c: 3, m: 1 },
+		  WrongDocumentError: { s: 'WRONG_DOCUMENT_ERR', c: 4, m: 1 },
+		  InvalidCharacterError: { s: 'INVALID_CHARACTER_ERR', c: 5, m: 1 },
+		  NoDataAllowedError: { s: 'NO_DATA_ALLOWED_ERR', c: 6, m: 0 },
+		  NoModificationAllowedError: { s: 'NO_MODIFICATION_ALLOWED_ERR', c: 7, m: 1 },
+		  NotFoundError: { s: 'NOT_FOUND_ERR', c: 8, m: 1 },
+		  NotSupportedError: { s: 'NOT_SUPPORTED_ERR', c: 9, m: 1 },
+		  InUseAttributeError: { s: 'INUSE_ATTRIBUTE_ERR', c: 10, m: 1 },
+		  InvalidStateError: { s: 'INVALID_STATE_ERR', c: 11, m: 1 },
+		  SyntaxError: { s: 'SYNTAX_ERR', c: 12, m: 1 },
+		  InvalidModificationError: { s: 'INVALID_MODIFICATION_ERR', c: 13, m: 1 },
+		  NamespaceError: { s: 'NAMESPACE_ERR', c: 14, m: 1 },
+		  InvalidAccessError: { s: 'INVALID_ACCESS_ERR', c: 15, m: 1 },
+		  ValidationError: { s: 'VALIDATION_ERR', c: 16, m: 0 },
+		  TypeMismatchError: { s: 'TYPE_MISMATCH_ERR', c: 17, m: 1 },
+		  SecurityError: { s: 'SECURITY_ERR', c: 18, m: 1 },
+		  NetworkError: { s: 'NETWORK_ERR', c: 19, m: 1 },
+		  AbortError: { s: 'ABORT_ERR', c: 20, m: 1 },
+		  URLMismatchError: { s: 'URL_MISMATCH_ERR', c: 21, m: 1 },
+		  QuotaExceededError: { s: 'QUOTA_EXCEEDED_ERR', c: 22, m: 1 },
+		  TimeoutError: { s: 'TIMEOUT_ERR', c: 23, m: 1 },
+		  InvalidNodeTypeError: { s: 'INVALID_NODE_TYPE_ERR', c: 24, m: 1 },
+		  DataCloneError: { s: 'DATA_CLONE_ERR', c: 25, m: 1 }
+		};
+		return domExceptionConstants;
+	}
+
+	var hasRequiredWeb_domException_constructor;
+
+	function requireWeb_domException_constructor () {
+		if (hasRequiredWeb_domException_constructor) return web_domException_constructor;
+		hasRequiredWeb_domException_constructor = 1;
+		var $ = require_export();
+		var getBuiltIn = requireGetBuiltIn();
+		var getBuiltInNodeModule = requireGetBuiltInNodeModule();
+		var fails = requireFails();
+		var create = requireObjectCreate();
+		var createPropertyDescriptor = requireCreatePropertyDescriptor();
+		var defineProperty = requireObjectDefineProperty().f;
+		var defineBuiltIn = requireDefineBuiltIn();
+		var defineBuiltInAccessor = requireDefineBuiltInAccessor();
+		var hasOwn = requireHasOwnProperty();
+		var anInstance = requireAnInstance();
+		var anObject = requireAnObject();
+		var errorToString = requireErrorToString();
+		var normalizeStringArgument = requireNormalizeStringArgument();
+		var DOMExceptionConstants = requireDomExceptionConstants();
+		var clearErrorStack = requireErrorStackClear();
+		var InternalStateModule = requireInternalState();
+		var DESCRIPTORS = requireDescriptors();
+		var IS_PURE = requireIsPure();
+
+		var DOM_EXCEPTION = 'DOMException';
+		var DATA_CLONE_ERR = 'DATA_CLONE_ERR';
+		var Error = getBuiltIn('Error');
+		// NodeJS < 17.0 does not expose `DOMException` to global
+		var NativeDOMException = getBuiltIn(DOM_EXCEPTION) || (function () {
+		  try {
+		    // NodeJS < 15.0 does not expose `MessageChannel` to global
+		    var MessageChannel = getBuiltIn('MessageChannel') || getBuiltInNodeModule('worker_threads').MessageChannel;
+		    // eslint-disable-next-line es/no-weak-map, unicorn/require-post-message-target-origin -- safe
+		    new MessageChannel().port1.postMessage(new WeakMap());
+		  } catch (error) {
+		    if (error.name === DATA_CLONE_ERR && error.code === 25) return error.constructor;
+		  }
+		})();
+		var NativeDOMExceptionPrototype = NativeDOMException && NativeDOMException.prototype;
+		var ErrorPrototype = Error.prototype;
+		var setInternalState = InternalStateModule.set;
+		var getInternalState = InternalStateModule.getterFor(DOM_EXCEPTION);
+		var HAS_STACK = 'stack' in new Error(DOM_EXCEPTION);
+
+		var codeFor = function (name) {
+		  return hasOwn(DOMExceptionConstants, name) && DOMExceptionConstants[name].m ? DOMExceptionConstants[name].c : 0;
+		};
+
+		var $DOMException = function DOMException() {
+		  anInstance(this, DOMExceptionPrototype);
+		  var argumentsLength = arguments.length;
+		  var message = normalizeStringArgument(argumentsLength < 1 ? undefined : arguments[0]);
+		  var name = normalizeStringArgument(argumentsLength < 2 ? undefined : arguments[1], 'Error');
+		  var code = codeFor(name);
+		  setInternalState(this, {
+		    type: DOM_EXCEPTION,
+		    name: name,
+		    message: message,
+		    code: code
+		  });
+		  if (!DESCRIPTORS) {
+		    this.name = name;
+		    this.message = message;
+		    this.code = code;
+		  }
+		  if (HAS_STACK) {
+		    var error = new Error(message);
+		    error.name = DOM_EXCEPTION;
+		    defineProperty(this, 'stack', createPropertyDescriptor(1, clearErrorStack(error.stack, 1)));
+		  }
+		};
+
+		var DOMExceptionPrototype = $DOMException.prototype = create(ErrorPrototype);
+
+		var createGetterDescriptor = function (get) {
+		  return { enumerable: true, configurable: true, get: get };
+		};
+
+		var getterFor = function (key) {
+		  return createGetterDescriptor(function () {
+		    return getInternalState(this)[key];
+		  });
+		};
+
+		if (DESCRIPTORS) {
+		  // `DOMException.prototype.code` getter
+		  defineBuiltInAccessor(DOMExceptionPrototype, 'code', getterFor('code'));
+		  // `DOMException.prototype.message` getter
+		  defineBuiltInAccessor(DOMExceptionPrototype, 'message', getterFor('message'));
+		  // `DOMException.prototype.name` getter
+		  defineBuiltInAccessor(DOMExceptionPrototype, 'name', getterFor('name'));
+		}
+
+		defineProperty(DOMExceptionPrototype, 'constructor', createPropertyDescriptor(1, $DOMException));
+
+		// FF36- DOMException is a function, but can't be constructed
+		var INCORRECT_CONSTRUCTOR = fails(function () {
+		  return !(new NativeDOMException() instanceof Error);
+		});
+
+		// Safari 10.1 / Chrome 32- / IE8- DOMException.prototype.toString bugs
+		var INCORRECT_TO_STRING = INCORRECT_CONSTRUCTOR || fails(function () {
+		  return ErrorPrototype.toString !== errorToString || String(new NativeDOMException(1, 2)) !== '2: 1';
+		});
+
+		// Deno 1.6.3- DOMException.prototype.code just missed
+		var INCORRECT_CODE = INCORRECT_CONSTRUCTOR || fails(function () {
+		  return new NativeDOMException(1, 'DataCloneError').code !== 25;
+		});
+
+		// Deno 1.6.3- DOMException constants just missed
+		var MISSED_CONSTANTS = INCORRECT_CONSTRUCTOR
+		  || NativeDOMException[DATA_CLONE_ERR] !== 25
+		  || NativeDOMExceptionPrototype[DATA_CLONE_ERR] !== 25;
+
+		var FORCED_CONSTRUCTOR = IS_PURE ? INCORRECT_TO_STRING || INCORRECT_CODE || MISSED_CONSTANTS : INCORRECT_CONSTRUCTOR;
+
+		// `DOMException` constructor
+		// https://webidl.spec.whatwg.org/#idl-DOMException
+		$({ global: true, constructor: true, forced: FORCED_CONSTRUCTOR }, {
+		  DOMException: FORCED_CONSTRUCTOR ? $DOMException : NativeDOMException
+		});
+
+		var PolyfilledDOMException = getBuiltIn(DOM_EXCEPTION);
+		var PolyfilledDOMExceptionPrototype = PolyfilledDOMException.prototype;
+
+		if (INCORRECT_TO_STRING && (IS_PURE || NativeDOMException === PolyfilledDOMException)) {
+		  defineBuiltIn(PolyfilledDOMExceptionPrototype, 'toString', errorToString);
+		}
+
+		if (INCORRECT_CODE && DESCRIPTORS && NativeDOMException === PolyfilledDOMException) {
+		  defineBuiltInAccessor(PolyfilledDOMExceptionPrototype, 'code', createGetterDescriptor(function () {
+		    return codeFor(anObject(this).name);
+		  }));
+		}
+
+		// `DOMException` constants
+		for (var key in DOMExceptionConstants) if (hasOwn(DOMExceptionConstants, key)) {
+		  var constant = DOMExceptionConstants[key];
+		  var constantName = constant.s;
+		  var descriptor = createPropertyDescriptor(6, constant.c);
+		  if (!hasOwn(PolyfilledDOMException, constantName)) {
+		    defineProperty(PolyfilledDOMException, constantName, descriptor);
+		  }
+		  if (!hasOwn(PolyfilledDOMExceptionPrototype, constantName)) {
+		    defineProperty(PolyfilledDOMExceptionPrototype, constantName, descriptor);
+		  }
+		}
+		return web_domException_constructor;
+	}
+
+	requireWeb_domException_constructor();
+
+	var web_domException_stack = {};
+
+	var hasRequiredWeb_domException_stack;
+
+	function requireWeb_domException_stack () {
+		if (hasRequiredWeb_domException_stack) return web_domException_stack;
+		hasRequiredWeb_domException_stack = 1;
+		var $ = require_export();
+		var globalThis = requireGlobalThis();
+		var getBuiltIn = requireGetBuiltIn();
+		var createPropertyDescriptor = requireCreatePropertyDescriptor();
+		var defineProperty = requireObjectDefineProperty().f;
+		var hasOwn = requireHasOwnProperty();
+		var anInstance = requireAnInstance();
+		var inheritIfRequired = requireInheritIfRequired();
+		var normalizeStringArgument = requireNormalizeStringArgument();
+		var DOMExceptionConstants = requireDomExceptionConstants();
+		var clearErrorStack = requireErrorStackClear();
+		var DESCRIPTORS = requireDescriptors();
+		var IS_PURE = requireIsPure();
+
+		var DOM_EXCEPTION = 'DOMException';
+		var Error = getBuiltIn('Error');
+		var NativeDOMException = getBuiltIn(DOM_EXCEPTION);
+
+		var $DOMException = function DOMException() {
+		  anInstance(this, DOMExceptionPrototype);
+		  var argumentsLength = arguments.length;
+		  var message = normalizeStringArgument(argumentsLength < 1 ? undefined : arguments[0]);
+		  var name = normalizeStringArgument(argumentsLength < 2 ? undefined : arguments[1], 'Error');
+		  var that = new NativeDOMException(message, name);
+		  var error = new Error(message);
+		  error.name = DOM_EXCEPTION;
+		  defineProperty(that, 'stack', createPropertyDescriptor(1, clearErrorStack(error.stack, 1)));
+		  inheritIfRequired(that, this, $DOMException);
+		  return that;
+		};
+
+		var DOMExceptionPrototype = $DOMException.prototype = NativeDOMException.prototype;
+
+		var ERROR_HAS_STACK = 'stack' in new Error(DOM_EXCEPTION);
+		var DOM_EXCEPTION_HAS_STACK = 'stack' in new NativeDOMException(1, 2);
+
+		// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+		var descriptor = NativeDOMException && DESCRIPTORS && Object.getOwnPropertyDescriptor(globalThis, DOM_EXCEPTION);
+
+		// Bun ~ 0.1.1 DOMException have incorrect descriptor and we can't redefine it
+		// https://github.com/Jarred-Sumner/bun/issues/399
+		var BUGGY_DESCRIPTOR = !!descriptor && !(descriptor.writable && descriptor.configurable);
+
+		var FORCED_CONSTRUCTOR = ERROR_HAS_STACK && !BUGGY_DESCRIPTOR && !DOM_EXCEPTION_HAS_STACK;
+
+		// `DOMException` constructor patch for `.stack` where it's required
+		// https://webidl.spec.whatwg.org/#es-DOMException-specialness
+		$({ global: true, constructor: true, forced: IS_PURE || FORCED_CONSTRUCTOR }, { // TODO: fix export logic
+		  DOMException: FORCED_CONSTRUCTOR ? $DOMException : NativeDOMException
+		});
+
+		var PolyfilledDOMException = getBuiltIn(DOM_EXCEPTION);
+		var PolyfilledDOMExceptionPrototype = PolyfilledDOMException.prototype;
+
+		if (PolyfilledDOMExceptionPrototype.constructor !== PolyfilledDOMException) {
+		  if (!IS_PURE) {
+		    defineProperty(PolyfilledDOMExceptionPrototype, 'constructor', createPropertyDescriptor(1, PolyfilledDOMException));
+		  }
+
+		  for (var key in DOMExceptionConstants) if (hasOwn(DOMExceptionConstants, key)) {
+		    var constant = DOMExceptionConstants[key];
+		    var constantName = constant.s;
+		    if (!hasOwn(PolyfilledDOMException, constantName)) {
+		      defineProperty(PolyfilledDOMException, constantName, createPropertyDescriptor(6, constant.c));
+		    }
+		  }
+		}
+		return web_domException_stack;
+	}
+
+	requireWeb_domException_stack();
+
+	var web_domException_toStringTag = {};
+
+	var hasRequiredWeb_domException_toStringTag;
+
+	function requireWeb_domException_toStringTag () {
+		if (hasRequiredWeb_domException_toStringTag) return web_domException_toStringTag;
+		hasRequiredWeb_domException_toStringTag = 1;
+		var getBuiltIn = requireGetBuiltIn();
+		var setToStringTag = requireSetToStringTag();
+
+		var DOM_EXCEPTION = 'DOMException';
+
+		// `DOMException.prototype[@@toStringTag]` property
+		setToStringTag(getBuiltIn(DOM_EXCEPTION), DOM_EXCEPTION);
+		return web_domException_toStringTag;
+	}
+
+	requireWeb_domException_toStringTag();
+
+	var web_queueMicrotask = {};
+
+	var hasRequiredWeb_queueMicrotask;
+
+	function requireWeb_queueMicrotask () {
+		if (hasRequiredWeb_queueMicrotask) return web_queueMicrotask;
+		hasRequiredWeb_queueMicrotask = 1;
+		var $ = require_export();
+		var globalThis = requireGlobalThis();
+		var microtask = requireMicrotask();
+		var aCallable = requireACallable();
+		var validateArgumentsLength = requireValidateArgumentsLength();
+		var fails = requireFails();
+		var DESCRIPTORS = requireDescriptors();
+
+		// Bun ~ 1.0.30 bug
+		// https://github.com/oven-sh/bun/issues/9249
+		var WRONG_ARITY = fails(function () {
+		  // getOwnPropertyDescriptor for prevent experimental warning in Node 11
+		  // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+		  return DESCRIPTORS && Object.getOwnPropertyDescriptor(globalThis, 'queueMicrotask').value.length !== 1;
+		});
+
+		// `queueMicrotask` method
+		// https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-queuemicrotask
+		$({ global: true, enumerable: true, dontCallGetSet: true, forced: WRONG_ARITY }, {
+		  queueMicrotask: function queueMicrotask(fn) {
+		    validateArgumentsLength(arguments.length, 1);
+		    microtask(aCallable(fn));
+		  }
+		});
+		return web_queueMicrotask;
+	}
+
+	requireWeb_queueMicrotask();
 
 	var web_self = {};
 
