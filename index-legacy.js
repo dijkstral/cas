@@ -41433,7 +41433,7 @@
                         }
                       }, [createBaseVNode("span", {
                         class: "before:content-['•'] before:mr-1 before:inline-block"
-                      }), createTextVNode("**该数据均为2024年指标 ")], -1)), _cache[29] || (_cache[29] = createBaseVNode("div", {
+                      }), createTextVNode("**该数据均为2025年指标 ")], -1)), _cache[29] || (_cache[29] = createBaseVNode("div", {
                         class: "text-12px mb-10px text-#606266",
                         style: {
                           "padding-left": "25px",
@@ -41441,7 +41441,7 @@
                         }
                       }, [createBaseVNode("span", {
                         class: "before:content-['•'] before:mr-1 before:inline-block"
-                      }), createTextVNode("***表中列出的APC (Article Processing Charge，文章处理费)为全文文章(full-length article)标准APC价格，其他类型论文 APC 信息请访问相应期刊主页。 ")], -1)), createVNode(_component_el_pagination, {
+                      }), createTextVNode("***表中列出的APC (Article Publishing Charge，文章处理费)为全文文章(full-length article)标准APC价格，其他类型论文 APC 信息请访问相应期刊主页。 ")], -1)), createVNode(_component_el_pagination, {
                         class: "flex justify-center",
                         style: {
                           "margin": "0 auto"
@@ -42541,7 +42541,7 @@
                     class: "mt-40px text-13px"
                   }, " 中国科学院集团（Chinese Academy of Sciences Consortium）与爱思唯尔（Elsevier）达成一项协议，旨在支持其研究人员发表开放获取（Open Access, OA）文章。 "), createBaseVNode("div", {
                     class: "mt-40px text-13px"
-                  }, " 根据该协议，中国科学院集团通讯作者可在爱思唯尔期刊上以OA形式发表其研究成果，其中部分APC (Article Processing Charge，文章处理费)将由中国科学院文献采购集团和爱思唯尔出版社共同达成的转换协议方案提供的资金补助支付，其余费用则由通讯作者自行承担。 "), createBaseVNode("div", {
+                  }, " 根据该协议，中国科学院集团通讯作者可在爱思唯尔期刊上以OA形式发表其研究成果，其中部分APC (Article Publishing Charge，文章处理费)将由中国科学院文献采购集团和爱思唯尔出版社共同达成的转换协议方案提供的资金补助支付，其余费用则由通讯作者自行承担。 "), createBaseVNode("div", {
                     class: "text-16px mt-30px",
                     style: {
                       "font-weight": "600"
