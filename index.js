@@ -73616,7 +73616,7 @@ export function __vite_legacy_guard() {
                           icon: unref(plus_default)
                         }, {
                           default: withCtx(() => [..._cache[70] || (_cache[70] = [
-                            createBaseVNode("div", { class: "text-16px font-normal" }, " 系统中的通讯作者机构用于判定该论文是否有资格享受中国科学院APC资助，而在Right and Access过程中填写的账单地址信息用于开具APC发票以及作者后续的报销事宜，两者可不保持一致。 ", -1)
+                            createBaseVNode("div", { class: "text-16px font-normal" }, " 系统中的通讯作者机构用于判定该论文是否有资格享受中国科学院APC资助。 ", -1)
                           ])]),
                           _: 1
                         }, 8, ["icon"]),
@@ -73670,10 +73670,8 @@ export function __vite_legacy_guard() {
                             createBaseVNode("div", { class: "text-16px font-normal" }, [
                               createBaseVNode("ul", { class: "font-400" }, [
                                 createBaseVNode("li", null, " 在APC申请未完成处理前，作者将不会再收到相关邮件信息；在管理员完成申请审批后，系统将以邮件的形式告知作者相关处理结果。 "),
-                                createBaseVNode("li", null, "APC申请同意："),
-                                createBaseVNode("li", null, " 管理员在EOAP系统中批准作者的APC申请后，系统将以邮件形式通知作者其APC申请已被批准。 "),
-                                createBaseVNode("li", null, "APC申请被驳回："),
-                                createBaseVNode("li", null, " 管理员在EOAP系统中驳回作者的APC申请后，系统将以邮件形式通知作者其APC申请已被驳回并告知驳回原因；作者可在7个自然日内与机构管理员沟通相关事项；若作者对审批结果无异议，则在收到邮件7个自然日后，Elsevier以邮件形式将全额APC支付信息发送至作者邮箱，以便作者完成后续APC支付流程。 ")
+                                createBaseVNode("li", null, "APC申请同意：管理员在EOAP系统中批准作者的APC申请后，系统将以邮件形式通知作者其APC申请已被批准。 "),
+                                createBaseVNode("li", null, "APC申请被驳回：管理员在EOAP系统中驳回作者的APC申请后，系统将以邮件形式通知作者其APC申请已被驳回并告知驳回原因；作者可在7个自然日内与机构管理员沟通相关事项；若作者对审批结果无异议，则在收到邮件7个自然日后，Elsevier以邮件形式将全额APC支付信息发送至作者邮箱，以便作者完成后续APC支付流程。 ")
                               ])
                             ], -1)
                           ])]),
@@ -73849,7 +73847,7 @@ export function __vite_legacy_guard() {
       };
     }
   });
-  const index = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-a58ac2e0"]]);
+  const index = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-fcd939e8"]]);
   const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     default: index
